@@ -1,0 +1,117 @@
+<div class="wizard-container" *ngIf="!loading && !error && module">
+  <!-- Header -->
+  <div class="wizard-header">
+    <h1>{{ module.title }}</h1>
+    <p class="description">{{ module.description }}</p>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="wizard-progress">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progressPercent"></div>
+    </div>
+    <span class="progress-text">Page {{ currentPageIndex + 1 }} of {{ totalPages }}</span>
+  </div>
+
+  <!-- Page navigation dots -->
+  <div class="wizard-nav">
+    <button
+      *ngFor="let page of module.pages; let i = index"
+      class="nav-dot"
+      [class.active]="i === currentPageIndex"
+      [class.completed]="isPageCompleted(i)"
+      [class.accessible]="isPageAccessible(i)"
+      [disabled]="!isPageAccessible(i)"
+      (click)="goToPage(i)"
+      [title]="page.title">
+      {{ i + 1 }}
+    </button>
+  </div>
+
+  <!-- Current page content -->
+  <div class="wizard-page" *ngIf="currentPage">
+    <h2 class="page-title">{{ currentPage.title }}</h2>
+
+    <!-- WHY section -->
+    <section class="why-section">
+      <h3>Why?</h3>
+      <p>{{ currentPage.why }}</p>
+    </section>
+
+    <!-- INSTRUCTIONS section -->
+    <section class="instructions-section">
+      <h3>What to do</h3>
+      <ol class="instruction-list">
+        <li *ngFor="let step of currentPage.instructions" class="instruction-step">
+          <p class="step-text">{{ step.text }}</p>
+          <code *ngIf="step.command" class="step-command">{{ step.command }}</code>
+          <p *ngIf="step.note" class="step-note">{{ step.note }}</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- QUESTIONS section -->
+    <section class="questions-section" *ngIf="currentPage.questions.length > 0">
+      <h3>Check your understanding</h3>
+
+      <div *ngFor="let question of currentPage.questions" class="question-card">
+        <p class="question-text">{{ question.text }}</p>
+
+        <div class="options-list">
+          <label
+            *ngFor="let option of question.options; let oi = index"
+            class="option-label"
+            [class.selected]="getSelectedAnswer(question.id) === oi"
+            [class.correct]="isAnswered(question.id) && isOptionCorrect(question, oi)"
+            [class.incorrect]="isAnswered(question.id) && getSelectedAnswer(question.id) === oi && !isOptionCorrect(question, oi)"
+            [class.disabled]="isAnswered(question.id)">
+            <input
+              type="radio"
+              [name]="question.id"
+              [value]="oi"
+              [checked]="getSelectedAnswer(question.id) === oi"
+              [disabled]="isAnswered(question.id)"
+              (change)="selectAnswer(question, oi)">
+            <span class="option-text">{{ option }}</span>
+          </label>
+        </div>
+
+        <div class="question-actions" *ngIf="!isAnswered(question.id)">
+          <button
+            class="btn-primary btn-small"
+            [disabled]="getSelectedAnswer(question.id) === null"
+            (click)="submitAnswer(question)">
+            Submit Answer
+          </button>
+        </div>
+
+        <div class="question-feedback" *ngIf="isAnswered(question.id)">
+          <p *ngIf="isCorrect(question)" class="feedback-correct">Correct!</p>
+          <p *ngIf="!isCorrect(question)" class="feedback-incorrect">
+            Incorrect. The correct answer is: {{ question.options[question.correctIndex] }}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page navigation -->
+    <div class="wizard-actions">
+      <button class="btn-secondary" [disabled]="!canGoPrev" (click)="goPrev()">Previous</button>
+      <button class="btn-primary" *ngIf="currentPageIndex < totalPages - 1" [disabled]="!canGoNext" (click)="goNext()">Next</button>
+      <span *ngIf="currentPageIndex === totalPages - 1 && currentPageCompleted" class="completion-message">
+        Congratulations! You have completed this certification module.
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Loading state -->
+<div *ngIf="loading" class="loading">
+  <p>Loading certification module...</p>
+</div>
+
+<!-- Error state -->
+<div *ngIf="error" class="error-message">
+  <h2>Error</h2>
+  <p>{{ error }}</p>
+</div>
