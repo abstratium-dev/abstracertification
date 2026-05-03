@@ -64,8 +64,8 @@ _Replace all `TODO_...` values with the values generated above.
    docker run -d \
      --name TODO \
      --network your-network \
-     -p 127.0.0.1:4108x:808x \
-     -p 127.0.0.1:900x:900x \
+     -p 127.0.0.1:41085:8085 \
+     -p 127.0.0.1:9007:9007 \
      -e QUARKUS_DATASOURCE_JDBC_URL="jdbc:mysql://your-mysql-host:3306/TODO" \
      -e QUARKUS_DATASOURCE_USERNAME="TODO_YOUR_USERNAME" \
      -e QUARKUS_DATASOURCE_PASSWORD="TODO_YOUR_SECURE_PASSWORD" \
@@ -93,7 +93,7 @@ _Replace all `TODO_...` values with the values generated above.
 
 4. **Access the application**:
    - Main application: http://localhost:4108x
-   - Management interface: http://localhost:900x/m/info
+   - Management interface: http://localhost:9007/m/info
 
 ### Prerequisites
 
@@ -122,11 +122,11 @@ TODO describe other functionality here.
 
 This project provides several endpoints for monitoring:
 
-- **Health Check**: `http://localhost:900x/m/health`
+- **Health Check**: `http://localhost:9007/m/health`
   - Returns application health status
   - Includes database connectivity check
 
-- **Info Endpoint**: `http://localhost:900x/m/info`
+- **Info Endpoint**: `http://localhost:9007/m/info`
   - Returns build information, version, and configuration
   - Useful for verifying deployment
 
