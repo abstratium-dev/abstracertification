@@ -16,19 +16,19 @@ This component requires a MySQL database. Create a database and user with the fo
 1. **Connect to MySQL** as root or admin user:
 
 (change `<password>` to your password)
-(change `<TODO>` to the project name)
+(change `<abstracertification>` to the project name)
 
 ```bash
 docker run -it --rm --network abstratium mysql mysql -h abstratium-mysql --port 3306 -u root -p<password>
 
-DROP USER IF EXISTS 'TODO'@'%';
+DROP USER IF EXISTS 'abstracertification'@'%';
 
-CREATE USER 'TODO'@'%' IDENTIFIED BY '<password>';
+CREATE USER 'abstracertification'@'%' IDENTIFIED BY '<password>';
 
-DROP DATABASE IF EXISTS TODO;
+DROP DATABASE IF EXISTS abstracertification;
 
-CREATE DATABASE TODO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-GRANT ALL PRIVILEGES ON TODO.* TO TODO@'%'; -- on own database
+CREATE DATABASE abstracertification CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON abstracertification.* TO abstracertification@'%'; -- on own database
 
 FLUSH PRIVILEGES;
 
@@ -53,7 +53,7 @@ TODO any env vars that need generating are to be described here.
 
 1. **Pull the latest image** from GitHub Container Registry:
    ```bash
-   docker pull ghcr.io/abstratium-dev/TODO:latest
+   docker pull ghcr.io/abstratium-dev/abstracertification:latest
    ```
 
 2. **Run the container**:
@@ -62,15 +62,18 @@ _Replace all `TODO_...` values with the values generated above.
 
    ```bash
    docker run -d \
-     --name TODO \
+     --name abstracertification \
      --network your-network \
      -p 127.0.0.1:41085:8085 \
      -p 127.0.0.1:9007:9007 \
-     -e QUARKUS_DATASOURCE_JDBC_URL="jdbc:mysql://your-mysql-host:3306/TODO" \
-     -e QUARKUS_DATASOURCE_USERNAME="TODO_YOUR_USERNAME" \
-     -e QUARKUS_DATASOURCE_PASSWORD="TODO_YOUR_SECURE_PASSWORD" \
-     -e COOKIE_ENCRYPTION_SECRET="TODO_YOUR_COOKIE_ENCRYPTION_SECRET" \
-     ghcr.io/abstratium-dev/TODO:latest
+     -e QUARKUS_DATASOURCE_JDBC_URL="jdbc:mysql://your-mysql-host:3306/abstracertification" \
+     -e QUARKUS_DATASOURCE_USERNAME="abstracertification" \
+     -e QUARKUS_DATASOURCE_PASSWORD="YOUR_SECURE_PASSWORD" \
+     -e COOKIE_ENCRYPTION_SECRET="YOUR_COOKIE_ENCRYPTION_SECRET" \
+     -e CSRF_TOKEN_SIGNATURE_KEY="YOUR_CSRF_TOKEN_SIGNATURE_KEY" \
+     -e ABSTRATIUM_CLIENT_ID="abstratium-abstracertification" \
+     -e ABSTRATIUM_CLIENT_SECRET="YOUR_OIDC_CLIENT_SECRET" \
+     ghcr.io/abstratium-dev/abstracertification:latest
    ```
 
    **Required Environment Variables:**
@@ -81,18 +84,18 @@ _Replace all `TODO_...` values with the values generated above.
    - `CSRF_TOKEN_SIGNATURE_KEY`: CSRF token signature key (min 32 chars, generate with `openssl rand -base64 64 | tr -d '\n'`)
    
    **Optional Environment Variables:**
-   - `TODO_ENV_VAR_NAME`: TODO
+   - `DEPLOYMENT_ENV`: Deployment environment name (default: `dev`)
 
 3. **Verify the container is running**:
    ```bash
    docker ps
-   docker logs TODO
-   curl http://localhost:4108x/m/health
-   curl http://localhost:4108x/m/info
+   docker logs abstracertification
+   curl http://localhost:41085/m/health
+   curl http://localhost:41085/m/info
    ```
 
 4. **Access the application**:
-   - Main application: http://localhost:4108x
+   - Main application: http://localhost:41085
    - Management interface: http://localhost:9007/m/info
 
 ### Prerequisites
@@ -112,7 +115,7 @@ TODO
 
 ## Account and Role Management
 
-This component requires that users can authenticate using an oauth authorization server. That requires that an administrator signs into something like `abstratium-abstrauth` first, to create the oauth2 client. The callback url should be `http://localhost:808x/oauth/callback` and one for the production environment, also ending in `/oauth/callback`. Use the `client_id` and `client_secret` that it provides, to set the values of the environment variables above, so that users can sign in.
+This component requires that users can authenticate using an oauth authorization server. That requires that an administrator signs into something like `abstratium-abstrauth` first, to create the oauth2 client. The callback url should be `http://localhost:8085/oauth/callback` and one for the production environment, also ending in `/oauth/callback`. Use the `client_id` and `client_secret` that it provides, to set the values of the environment variables above, so that users can sign in.
 
 ## TODO
 
@@ -134,14 +137,14 @@ This project provides several endpoints for monitoring:
 
 ### Container won't start
 
-1. Check Docker logs: `docker logs TODO`
+1. Check Docker logs: `docker logs abstracertification`
 2. Verify environment variables are set correctly
 3. Ensure database is accessible from container
 4. Check network connectivity: `docker network inspect your-network`
 
 ### Database connection errors
 
-1. Verify MySQL is running: `mysql -u TODO -p -h your-mysql-host`
+1. Verify MySQL is running: `mysql -u abstracertification -p -h your-mysql-host`
 2. Check firewall rules allow connection on port 3306
 3. Verify database user has correct permissions
 4. Check JDBC URL format is correct

@@ -108,7 +108,7 @@ sequenceDiagram
     OIDC->>Browser: 302 Redirect to Auth Server
     
     Note over Browser,Auth: Authorization Request
-    Browser->>Auth: GET /oauth2/authorize?<br/>response_type=code<br/>&client_id=abstratium-abstracore<br/>&redirect_uri=http://localhost:8085/oauth/callback<br/>&state=[random]<br/>&code_challenge=[hash]<br/>&code_challenge_method=S256<br/>&scope=openid+profile+email
+    Browser->>Auth: GET /oauth2/authorize?<br/>response_type=code<br/>&client_id=abstratium-abstracertification<br/>&redirect_uri=http://localhost:8085/oauth/callback<br/>&state=[random]<br/>&code_challenge=[hash]<br/>&code_challenge_method=S256<br/>&scope=openid+profile+email
     
     Auth->>Browser: Show login page
     Browser->>Auth: User authenticates
@@ -174,7 +174,7 @@ window.location.href = '/api/auth/login';
 ```
 https://auth.abstratium.dev/oauth2/authorize?
   response_type=code
-  &client_id=abstratium-abstracore
+  &client_id=abstratium-abstracertification
   &redirect_uri=http://localhost:8085/oauth/callback
   &state=9011d874-320f-4c83-8c64-cad203ec13ec
   &code_challenge=yWua0iJq5xA54UyURCz4S9W9XFxIw9VfanSv8t9rGR8
@@ -199,7 +199,7 @@ https://auth.abstratium.dev/oauth2/authorize?
 - Verifies ID token signature using JWKS from auth server
 - Validates:
   - **Issuer**: `https://abstrauth.abstratium.dev`
-  - **Audience**: `abstratium-abstracore`
+  - **Audience**: `abstratium-abstracertification`
   - **Expiration**: Token not expired
   - **Not Before**: Token is valid now
 
@@ -340,7 +340,7 @@ quarkus.http.auth.permission.api.policy=authenticated
 public class DemoResource {
     
     @GET
-    @RolesAllowed({Roles.USER})  // Requires "abstratium-abstracore_user" role
+    @RolesAllowed({Roles.USER})  // Requires "abstratium-abstracertification_user" role
     public List<Demo> getAll() {
         return demoService.findAll();
     }
@@ -348,7 +348,7 @@ public class DemoResource {
 ```
 
 **Role Mapping:**
-- JWT contains: `"groups": ["abstratium-abstracore_user"]`
+- JWT contains: `"groups": ["abstratium-abstracertification_user"]`
 - Mapped to roles via: `smallrye.jwt.path.groups=groups`
 - `@RolesAllowed` checks if user has required group
 
@@ -495,7 +495,7 @@ quarkus.oidc.auth-server-url=https://auth.abstratium.dev
 quarkus.oidc.token.issuer=https://abstrauth.abstratium.dev
 
 # Client Credentials
-quarkus.oidc.client-id=abstratium-abstracore
+quarkus.oidc.client-id=abstratium-abstracertification
 quarkus.oidc.credentials.secret=${ABSTRATIUM_CLIENT_SECRET}
 
 # Application Type
@@ -553,7 +553,7 @@ quarkus.oidc.token-state-manager.encryption-required=true
 
 #### Issue: 403 Forbidden on API calls
 
-**Cause:** Role mismatch - JWT has `abstratium-TODO_user` but code checks for `abstratium-TODO_other`.
+**Cause:** Role mismatch - JWT has `abstratium-abstracertification_user` but code checks for a different role.
 
 **Solution:** Update `Roles.CLIENT_ID` to match actual OIDC client ID.
 

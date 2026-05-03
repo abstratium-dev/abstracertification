@@ -1,6 +1,6 @@
 # Observability Setup with Grafana, Loki, and OpenTelemetry
 
-This document describes the observability setup for the Abstracore application, including how to view logs, traces, and telemetry data locally using Grafana and Loki.
+This document describes the observability setup for the abstracertification application, including how to view logs, traces, and telemetry data locally using Grafana and Loki.
 
 ## Overview
 
@@ -40,17 +40,17 @@ See the separate document `grafana-docker-setup.md` for detailed Docker Compose 
 2. Select **Loki** as the data source
 3. Use LogQL queries to filter logs:
    ```logql
-   # All logs from abstracore
-   {service_name="abstracore"}
+   # All logs from abstracertification
+   {service_name="abstracertification"}
    
    # Logs with specific trace ID
-   {service_name="abstracore"} | traceID="abc123..."
+   {service_name="abstracertification"} | traceID="abc123..."
    
    # Error logs only
-   {service_name="abstracore"} | level="ERROR"
+   {service_name="abstracertification"} | level="ERROR"
    
    # Logs containing specific text
-   {service_name="abstracore"} |= "database"
+   {service_name="abstracertification"} |= "database"
    ```
 
 #### Viewing Traces (Tempo)
@@ -59,7 +59,7 @@ See the separate document `grafana-docker-setup.md` for detailed Docker Compose 
 2. Select **Tempo** as the data source
 3. Search for traces:
    - By Trace ID
-   - By service name: `abstracore`
+   - By service name: `abstracertification`
    - By duration or time range
 
 4. **Trace Details** show:
@@ -300,7 +300,7 @@ The observability features are configured in `src/main/resources/application.pro
 
 ```properties
 # Application name (appears as service.name in telemetry)
-quarkus.application.name=abstracore
+quarkus.application.name=abstracertification
 
 # Enable OpenTelemetry logging
 quarkus.otel.logs.enabled=true

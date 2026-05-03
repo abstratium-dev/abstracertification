@@ -9,11 +9,11 @@
 
 First add env vars:
 
-    source /w/abstratium-TODO.env
+    source /w/abstratium-abstracertification.env
 
 That file should contain:
 
-    export ABSTRATIUM_CLIENT_ID="abstratium-TODO"
+    export ABSTRATIUM_CLIENT_ID="abstratium-abstracertification"
     export ABSTRATIUM_CLIENT_SECRET="... (taken from the abstrauth application)"
     export CSRF_TOKEN_SIGNATURE_KEY="... (generated with `openssl rand -base64 64 | tr -d '\n'`)"
     export COOKIE_ENCRYPTION_SECRET="... (generated with `openssl rand -base64 32`)"
@@ -55,16 +55,14 @@ docker run -d \
 # create the database and user
 docker run -it --rm --network abstratium mysql mysql -h abstratium-mysql --port 3306 -u root -psecret
 
-TODO change `abstracore` to the actual database name, in all of the statements below
+DROP USER IF EXISTS 'abstracertification'@'%';
 
-DROP USER IF EXISTS 'abstracore'@'%';
+CREATE USER 'abstracertification'@'%' IDENTIFIED BY 'secret';
 
-CREATE USER 'abstracore'@'%' IDENTIFIED BY 'secret';
+DROP DATABASE IF EXISTS abstracertification;
 
-DROP DATABASE IF EXISTS abstracore;
-
-CREATE DATABASE abstracore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-GRANT ALL PRIVILEGES ON abstracore.* TO abstracore@'%'; -- on own database
+CREATE DATABASE abstracertification CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON abstracertification.* TO abstracertification@'%'; -- on own database
 
 FLUSH PRIVILEGES;
 ```
@@ -72,7 +70,7 @@ FLUSH PRIVILEGES;
 exit, then reconnect using the new user:
 
 ```bash
-docker run -it --network abstratium --rm mysql mysql -h abstratium-mysql --port 3306 -u TODO -psecret TODO
+docker run -it --network abstratium --rm mysql mysql -h abstratium-mysql --port 3306 -u abstracertification -psecret abstracertification
 ```
 
 # Authorization
@@ -101,7 +99,7 @@ It might be easier to test these manually during testing.
 
 Start the component:
 ```bash
-source /w/abstratium-TODO.env
+source /w/abstratium-abstracertification.env
 quarkus dev
 ```
 
@@ -118,14 +116,14 @@ And then execute them manually by clicking the play button in the UI which opene
 
 ## Upgrading the Abstracore Baseline
 
-To merge the latest version of the Abstracore baseline into your project, use the provided sync script:
+To merge the latest version of the abstracore baseline into your project, use the provided sync script:
 
 ```bash
 ./scripts/sync-base.sh
 ```
 
 This script will:
-1. Fetch the latest changes from the upstream Abstracore repository
+1. Fetch the latest changes from the upstream abstracore repository
 2. Merge them into your project (with `--no-commit` for review)
 3. Update the baseline build timestamp via the pre-commit hook when you commit
 
@@ -158,7 +156,7 @@ ng update
 ng update @angular/cli @angular/core
 ```
 
-5. Check Github for security problems by signing in and viewing the problems here: https://github.com/abstratium-dev/TODO/security/dependabot and https://github.com/abstratium-dev/TODO/security/code-scanning
+5. Check Github for security problems by signing in and viewing the problems here: https://github.com/abstratium-dev/abstracertification/security/dependabot and https://github.com/abstratium-dev/abstracertification/security/code-scanning
 
 # Issues with Webkit
 

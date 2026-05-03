@@ -1,3 +1,3 @@
-# TODO
+# Abstracertification Decisions
 
-a file per project decision
+A file per project decision.
