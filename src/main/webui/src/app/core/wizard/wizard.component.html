@@ -3,6 +3,25 @@
   <div class="wizard-header">
     <h1>{{ module.title }}</h1>
     <p class="description">{{ module.description }}</p>
+
+    <!-- Font size controls -->
+    <div class="font-size-controls">
+      <button
+        class="font-size-btn"
+        [class.active]="fontSize === 'small'"
+        (click)="setFontSize('small')"
+        title="Small text">A</button>
+      <button
+        class="font-size-btn"
+        [class.active]="fontSize === 'medium'"
+        (click)="setFontSize('medium')"
+        title="Medium text">A</button>
+      <button
+        class="font-size-btn"
+        [class.active]="fontSize === 'large'"
+        (click)="setFontSize('large')"
+        title="Large text">A</button>
+    </div>
   </div>
 
   <!-- Progress bar -->
@@ -10,26 +29,62 @@
     <div class="progress-bar">
       <div class="progress-fill" [style.width.%]="progressPercent"></div>
     </div>
-    <span class="progress-text">Page {{ currentPageIndex + 1 }} of {{ totalPages }}</span>
+    <span class="progress-text">Step {{ currentStepIndex + 1 }} of {{ totalSteps }}</span>
   </div>
 
-  <!-- Page navigation dots -->
+  <!-- Step navigation dots -->
   <div class="wizard-nav">
     <button
-      *ngFor="let page of module.pages; let i = index"
+      *ngFor="let step of steps; let i = index"
       class="nav-dot"
-      [class.active]="i === currentPageIndex"
-      [class.completed]="isPageCompleted(i)"
-      [class.accessible]="isPageAccessible(i)"
-      [disabled]="!isPageAccessible(i)"
-      (click)="goToPage(i)"
-      [title]="page.title">
+      [class.active]="i === currentStepIndex"
+      [class.completed]="isStepCompleted(i)"
+      [class.accessible]="isStepAccessible(i)"
+      [class.choice-dot]="step.type === 'choice'"
+      [disabled]="!isStepAccessible(i)"
+      (click)="goToStep(i)"
+      [title]="getStepLabel(i)">
       {{ i + 1 }}
     </button>
   </div>
 
-  <!-- Current page content -->
-  <div class="wizard-page" *ngIf="currentPage">
+  <!-- Choice step -->
+  <div class="wizard-page" [class.font-small]="fontSize === 'small'" [class.font-large]="fontSize === 'large'" *ngIf="currentChoice">
+    <h2 class="page-title">{{ currentChoice.label }}</h2>
+    <p class="choice-description">{{ currentChoice.description }}</p>
+
+    <div class="choice-variants">
+      <div
+        *ngFor="let variant of currentChoice.variants; let vi = index"
+        class="variant-card"
+        [class.variant-selected]="isVariantSelected(currentChoice.label, vi)"
+        (click)="toggleVariantSelection(currentChoice.label, vi)">
+        <div class="variant-indicator">
+          <span *ngIf="isVariantSelected(currentChoice.label, vi)" class="variant-check">&#10003;</span>
+        </div>
+        <div class="variant-content">
+          <h3 class="variant-label">{{ variant.label }}</h3>
+          <p class="variant-description">{{ variant.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="choice-hint" *ngIf="currentChoice.minRequired === currentChoice.maxRequired">
+      Select exactly {{ currentChoice.minRequired }} option{{ currentChoice.minRequired > 1 ? 's' : '' }}.
+    </p>
+    <p class="choice-hint" *ngIf="currentChoice.minRequired !== currentChoice.maxRequired">
+      Select between {{ currentChoice.minRequired }} and {{ currentChoice.maxRequired }} options.
+    </p>
+
+    <!-- Navigation for choice step -->
+    <div class="wizard-actions">
+      <button class="btn-secondary" [disabled]="!canGoPrev" (click)="goPrev()">Previous</button>
+      <button class="btn-primary" [disabled]="!canGoNext" (click)="goNext()">Next</button>
+    </div>
+  </div>
+
+  <!-- Page step -->
+  <div class="wizard-page" [class.font-small]="fontSize === 'small'" [class.font-large]="fontSize === 'large'" *ngIf="currentPage">
     <h2 class="page-title">{{ currentPage.title }}</h2>
 
     <!-- WHY section -->
@@ -38,12 +93,28 @@
       <p>{{ currentPage.why }}</p>
     </section>
 
+    <!-- INFO section -->
+    <section class="info-section" *ngIf="currentPage.info && currentPage.info.length > 0">
+      <h3>Key Concepts</h3>
+      <div class="info-box">
+        <dl class="info-list">
+          <div *ngFor="let item of currentPage.info" class="info-item">
+            <dt class="info-term">{{ item.term }}</dt>
+            <dd class="info-description">{{ item.description }}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
     <!-- INSTRUCTIONS section -->
     <section class="instructions-section">
       <h3>What to do</h3>
       <ol class="instruction-list">
         <li *ngFor="let step of currentPage.instructions" class="instruction-step">
           <p class="step-text">{{ step.text }}</p>
+          <div *ngIf="step.mermaid" class="mermaid-diagram">
+            <div class="mermaid" [attr.data-diagram]="step.mermaid"></div>
+          </div>
           <code *ngIf="step.command" class="step-command">{{ step.command }}</code>
           <p *ngIf="step.note" class="step-note">{{ step.note }}</p>
         </li>
@@ -51,54 +122,63 @@
     </section>
 
     <!-- QUESTIONS section -->
-    <section class="questions-section" *ngIf="currentPage.questions.length > 0">
+    <section class="questions-section" *ngIf="currentQuestions.length > 0">
       <h3>Check your understanding</h3>
 
-      <div *ngFor="let question of currentPage.questions" class="question-card">
+      <div *ngFor="let question of currentQuestions" class="question-card"
+           [class.question-correct]="pageSubmitted && isCorrect(question)"
+           [class.question-incorrect]="pageSubmitted && !isCorrect(question)">
         <p class="question-text">{{ question.text }}</p>
 
         <div class="options-list">
           <label
             *ngFor="let option of question.options; let oi = index"
             class="option-label"
-            [class.selected]="getSelectedAnswer(question.id) === oi"
-            [class.correct]="isAnswered(question.id) && isOptionCorrect(question, oi)"
-            [class.incorrect]="isAnswered(question.id) && getSelectedAnswer(question.id) === oi && !isOptionCorrect(question, oi)"
-            [class.disabled]="isAnswered(question.id)">
+            [class.selected]="!pageSubmitted && getSelectedAnswer(question.id) === oi"
+            [class.correct]="pageSubmitted && isOptionCorrect(question, oi)"
+            [class.incorrect]="pageSubmitted && getSelectedAnswer(question.id) === oi && !isOptionCorrect(question, oi)"
+            [class.disabled]="pageSubmitted">
             <input
               type="radio"
               [name]="question.id"
               [value]="oi"
               [checked]="getSelectedAnswer(question.id) === oi"
-              [disabled]="isAnswered(question.id)"
+              [disabled]="pageSubmitted"
               (change)="selectAnswer(question, oi)">
             <span class="option-text">{{ option }}</span>
           </label>
         </div>
 
-        <div class="question-actions" *ngIf="!isAnswered(question.id)">
-          <button
-            class="btn-primary btn-small"
-            [disabled]="getSelectedAnswer(question.id) === null"
-            (click)="submitAnswer(question)">
-            Submit Answer
-          </button>
-        </div>
-
-        <div class="question-feedback" *ngIf="isAnswered(question.id)">
+        <div class="question-feedback" *ngIf="pageSubmitted">
           <p *ngIf="isCorrect(question)" class="feedback-correct">Correct!</p>
           <p *ngIf="!isCorrect(question)" class="feedback-incorrect">
             Incorrect. The correct answer is: {{ question.options[question.correctIndex] }}
           </p>
         </div>
       </div>
+
+      <!-- Submit all answers -->
+      <div class="submit-section" *ngIf="!pageSubmitted">
+        <button
+          class="btn-primary"
+          [disabled]="!allQuestionsSelected"
+          (click)="submitPage()">
+          Submit Answers
+        </button>
+      </div>
     </section>
+
+    <!-- Reset prompt on wrong answer -->
+    <div class="reset-prompt" *ngIf="currentPageHasWrongAnswer">
+      <p>You got one or more answers wrong. Reset this page to try again.</p>
+      <button class="btn-danger btn-small" (click)="resetCurrentPage()">Try Again</button>
+    </div>
 
     <!-- Page navigation -->
     <div class="wizard-actions">
       <button class="btn-secondary" [disabled]="!canGoPrev" (click)="goPrev()">Previous</button>
-      <button class="btn-primary" *ngIf="currentPageIndex < totalPages - 1" [disabled]="!canGoNext" (click)="goNext()">Next</button>
-      <span *ngIf="currentPageIndex === totalPages - 1 && currentPageCompleted" class="completion-message">
+      <button class="btn-primary" *ngIf="currentStepIndex < totalSteps - 1" [disabled]="!canGoNext" (click)="goNext()">Next</button>
+      <span *ngIf="currentStepIndex === totalSteps - 1 && currentStepCompleted" class="completion-message">
         Congratulations! You have completed this certification module.
       </span>
     </div>

@@ -1,0 +1,85 @@
+{
+  "id": "dynamic-dns",
+  "title": "Setting Up Dynamic DNS with No-IP",
+  "why": "Most home internet connections have a dynamic IP address that changes periodically. This means the IP address you use to access your server from the internet may stop working after your ISP assigns you a new one. Dynamic DNS (DDNS) solves this by mapping a hostname (like myserver.ddns.net) to your current IP address and automatically updating it whenever it changes. No-IP is a popular free DDNS provider.",
+  "instructions": [
+    {
+      "text": "Create a free account at https://www.noip.com/. After registering, create a hostname (e.g. myserver.ddns.net) from the No-IP dashboard."
+    },
+    {
+      "text": "Install the No-IP Dynamic Update Client (DUC) on your server. First, download it.",
+      "command": "cd /usr/local/src\nsudo wget https://www.noip.com/client/linux/noip-duc-linux.tar.gz\nsudo tar xzf noip-duc-linux.tar.gz"
+    },
+    {
+      "text": "Build and install the client.",
+      "command": "cd noip-2.1.9-1\nsudo make\nsudo make install",
+      "note": "During installation, you'll be prompted for your No-IP email and password, and asked to choose which hostname to update."
+    },
+    {
+      "text": "Start the No-IP client.",
+      "command": "sudo /usr/local/bin/noip2"
+    },
+    {
+      "text": "Create a systemd service so the No-IP client starts automatically on boot. Create the service file:",
+      "command": "sudo nano /etc/systemd/system/noip2.service"
+    },
+    {
+      "text": "Add the following content to the service file:",
+      "command": "[Unit]\nDescription=No-IP Dynamic DNS Update Client\nAfter=network.target\n\n[Service]\nType=forking\nExecStart=/usr/local/bin/noip2\nRestart=on-failure\n\n[Install]\nWantedBy=multi-user.target"
+    },
+    {
+      "text": "Enable and start the service.",
+      "command": "sudo systemctl daemon-reload\nsudo systemctl enable noip2\nsudo systemctl start noip2"
+    },
+    {
+      "text": "Verify the service is running.",
+      "command": "sudo systemctl status noip2",
+      "note": "You should see 'active (running)'. The client will now automatically update your No-IP hostname with your current public IP."
+    },
+    {
+      "text": "Test your setup by accessing your server using your No-IP hostname from outside your network.",
+      "command": "curl http://myserver.ddns.net",
+      "note": "Replace myserver.ddns.net with your actual hostname. You should see the Nginx default page."
+    },
+    {
+      "text": "Optionally, update your Nginx server configuration to use your hostname.",
+      "command": "server_name myserver.ddns.net;",
+      "note": "Add this to your Nginx server block and reload Nginx."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-ddns-1",
+      "text": "Why do you need Dynamic DNS for a home server?",
+      "options": [
+        "To make your server faster",
+        "Because most home internet connections have a dynamic IP that changes, and DDNS keeps your hostname pointed at the current IP",
+        "To encrypt traffic between your server and the internet",
+        "Because DNS is required for Nginx to work"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "id": "q-ddns-2",
+      "text": "What does the No-IP DUC (Dynamic Update Client) do?",
+      "options": [
+        "It provides a firewall for your server",
+        "It monitors your public IP and updates the No-IP DNS record when it changes",
+        "It replaces your router's DNS settings",
+        "It assigns a static IP to your server"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "id": "q-ddns-3",
+      "text": "Why should you create a systemd service for the No-IP client?",
+      "options": [
+        "Systemd makes the client run faster",
+        "So the client starts automatically on boot and restarts if it crashes",
+        "Systemd is required for all Linux applications",
+        "To allow the client to modify firewall rules"
+      ],
+      "correctIndex": 1
+    }
+  ]
+}

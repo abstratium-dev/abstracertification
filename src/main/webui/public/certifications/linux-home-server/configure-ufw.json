@@ -1,0 +1,73 @@
+{
+  "id": "configure-ufw",
+  "title": "Setting Up UFW (Uncomplicated Firewall)",
+  "why": "A firewall is essential for securing your server. UFW (Uncomplicated Firewall) is a user-friendly front-end for iptables that makes it easy to manage firewall rules. Without a properly configured firewall, your server is exposed to every type of network attack. UFW lets you explicitly allow only the traffic you need, blocking everything else.",
+  "instructions": [
+    {
+      "text": "UFW is usually pre-installed on Ubuntu. Verify it is available.",
+      "command": "sudo ufw status",
+      "note": "If it shows 'inactive', that's expected — we haven't enabled it yet."
+    },
+    {
+      "text": "Before enabling UFW, allow SSH connections so you don't lock yourself out of the server.",
+      "command": "sudo ufw allow OpenSSH"
+    },
+    {
+      "text": "Allow HTTP and HTTPS traffic for Nginx.",
+      "command": "sudo ufw allow 'Nginx Full'"
+    },
+    {
+      "text": "Enable UFW.",
+      "command": "sudo ufw enable",
+      "note": "You will be asked to confirm. Type 'y' and press Enter. Make sure you have allowed SSH first!"
+    },
+    {
+      "text": "Verify the firewall rules.",
+      "command": "sudo ufw status verbose"
+    },
+    {
+      "text": "If you need to allow additional ports in the future, use the allow command.",
+      "command": "sudo ufw allow 8080/tcp",
+      "note": "This example allows TCP traffic on port 8080. Adjust as needed for your services."
+    },
+    {
+      "text": "To deny a specific port or remove a rule:",
+      "command": "sudo ufw deny 3306\nsudo ufw delete allow 8080/tcp"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-ufw-1",
+      "text": "Why must you allow SSH before enabling UFW?",
+      "options": [
+        "SSH is required for UFW to function",
+        "Without allowing SSH, you could lock yourself out of the server remotely",
+        "UFW does not start without SSH rules",
+        "SSH traffic is always blocked by default on Ubuntu"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "id": "q-ufw-2",
+      "text": "What does 'Nginx Full' include when used with UFW?",
+      "options": [
+        "Only port 80 (HTTP)",
+        "Only port 443 (HTTPS)",
+        "Both port 80 (HTTP) and port 443 (HTTPS)",
+        "Ports 80, 443, and 8080"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "id": "q-ufw-3",
+      "text": "What is the default policy of UFW when enabled?",
+      "options": [
+        "Allow all incoming and outgoing traffic",
+        "Deny all incoming traffic and allow all outgoing traffic",
+        "Block all traffic in both directions",
+        "Allow all incoming traffic and deny all outgoing traffic"
+      ],
+      "correctIndex": 1
+    }
+  ]
+}

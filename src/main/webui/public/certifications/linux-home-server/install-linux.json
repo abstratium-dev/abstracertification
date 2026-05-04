@@ -1,0 +1,66 @@
+{
+  "id": "install-linux",
+  "title": "Installing Linux on Your Home Server",
+  "why": "A home server gives you full control over your data and services. Linux is the ideal operating system for servers because it is free, open-source, extremely stable, and has excellent support for networking and server software. Ubuntu Server is a popular choice because of its long-term support (LTS) releases, large community, and straightforward installation process.",
+  "instructions": [
+    {
+      "text": "Download the Ubuntu Server ISO from the official website (https://ubuntu.com/download/server). Choose the latest LTS version for stability."
+    },
+    {
+      "text": "Create a bootable USB drive using a tool like Balena Etcher, Rufus (Windows), or the dd command on Linux.",
+      "command": "sudo dd if=ubuntu-24.04-live-server-amd64.iso of=/dev/sdX bs=4M status=progress",
+      "note": "Replace /dev/sdX with your actual USB device. Be very careful to select the correct device — this will overwrite all data on it."
+    },
+    {
+      "text": "Insert the USB drive into your home server and boot from it. You may need to change the boot order in your BIOS/UEFI settings (usually accessed by pressing F2, F12, DEL, or ESC during boot)."
+    },
+    {
+      "text": "Follow the Ubuntu Server installer. Choose your language, keyboard layout, and network configuration. For the disk setup, using the entire disk with LVM is recommended for flexibility."
+    },
+    {
+      "text": "Create your user account and set a strong password. Enable OpenSSH server when prompted — we will configure it further later."
+    },
+    {
+      "text": "After installation completes, remove the USB drive and reboot. Log in with the credentials you created."
+    },
+    {
+      "text": "Update the system to ensure all packages are current.",
+      "command": "sudo apt update && sudo apt upgrade -y"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-install-1",
+      "text": "Why is Linux preferred over Windows for a home server?",
+      "options": [
+        "Linux has better gaming support",
+        "Linux is free, open-source, stable, and has excellent networking and server support",
+        "Linux comes pre-installed on most hardware",
+        "Linux does not require any updates"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "id": "q-install-2",
+      "text": "What does the 'dd' command do when creating a bootable USB?",
+      "options": [
+        "It downloads the ISO file from the internet",
+        "It formats the USB drive to NTFS",
+        "It copies the ISO image byte-by-byte to the USB device",
+        "It installs Linux directly onto the server"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "id": "q-install-3",
+      "text": "Why is LVM recommended for disk setup?",
+      "options": [
+        "It makes the disk faster",
+        "It provides flexibility to resize partitions and manage storage later",
+        "It encrypts the entire disk automatically",
+        "It is the only option that Ubuntu supports"
+      ],
+      "correctIndex": 1
+    }
+  ]
+}

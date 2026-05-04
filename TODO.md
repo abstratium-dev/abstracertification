@@ -9,6 +9,27 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
+- add copyright notices to the source files
+- create a markdown document in the docs folder to describe the certification modules that can be added to the webui/public folder which describes the way in which you can configure modules and their pages including all the options that exist. it should act as a specification for future engineers and LLMs.
+- move wizard which is in core back up to abstracore
+- let user add notes
+- let user supply feedback
+- gamify the whole thing
+- add LLM support with a system message that is configured in the module. provide it with the current page content but no answers or questions. so that they can get help if they get stuck.
+  - this is a paid feature, altho give a few cents of free credit to try it out. like X tokens and once they are used, they have to purchase something
+- add i18n at a cost using an llm
+- show all of the modules and some of their content which will encourage people to sign in
+- remote desktop on linux
+- further modules
+  - security and hardening with optional remote internet access to the server.
+    - fail2ban
+    - disk encryption using abstravault
+    - firewall
+    - ssh hardening
+    - nginx rate limiting
+    - etc.
+  - wireguard vpn (peer to peer but as "client" and "server")
+
 
 - [ ] - Update SECURITY_DESIGN.md with project-specific information
 - [ ] - Update SECURITY.md with project-specific information

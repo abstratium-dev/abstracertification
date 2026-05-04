@@ -1,0 +1,87 @@
+{
+  "id": "install-linux-from-linux",
+  "title": "Installing Linux — Starting from Linux (dd)",
+  "why": "If your current machine already runs Linux, the dd command is the most straightforward way to create a bootable USB drive. It copies the ISO image byte-by-byte to the device, producing a perfect bootable copy. No additional software is needed — dd is included in every Linux distribution.",
+  "instructions": [
+    {
+      "text": "Download the Ubuntu Server ISO from the official website (https://ubuntu.com/download/server). Choose the latest LTS version for stability."
+    },
+    {
+      "text": "Insert a USB drive (at least 4 GB) into your Linux machine. WARNING: All data on this USB drive will be erased."
+    },
+    {
+      "text": "Identify your USB device. List all block devices and find your USB drive — it is typically /dev/sdb or /dev/sdc. Do NOT select your system disk.",
+      "command": "lsblk",
+      "note": "Look for the device that matches the size of your USB drive. Never use /dev/sda if that is your system disk."
+    },
+    {
+      "text": "Unmount the USB drive if it was auto-mounted.",
+      "command": "sudo umount /dev/sdX*",
+      "note": "Replace /dev/sdX with your actual USB device (e.g. /dev/sdb)."
+    },
+    {
+      "text": "Write the ISO image to the USB drive using dd.",
+      "command": "sudo dd if=ubuntu-24.04-live-server-amd64.iso of=/dev/sdX bs=4M status=progress conv=fsync",
+      "note": "Replace /dev/sdX with your actual USB device. The conv=fsync ensures all data is flushed to the drive. This will take a few minutes."
+    },
+    {
+      "text": "Verify the write completed successfully. The dd command will output the number of bytes written.",
+      "command": "sync"
+    },
+    {
+      "text": "Safely remove the USB drive.",
+      "command": "sudo eject /dev/sdX"
+    },
+    {
+      "text": "Insert the USB drive into your home server and boot from it. You may need to change the boot order in your BIOS/UEFI settings (usually accessed by pressing F2, F12, DEL, or ESC during boot)."
+    },
+    {
+      "text": "Follow the Ubuntu Server installer. Choose your language, keyboard layout, and network configuration. For the disk setup, using the entire disk with LVM is recommended for flexibility."
+    },
+    {
+      "text": "Create your user account and set a strong password. Enable OpenSSH server when prompted — we will configure it further later."
+    },
+    {
+      "text": "After installation completes, remove the USB drive and reboot. Log in with the credentials you created."
+    },
+    {
+      "text": "Update the system to ensure all packages are current.",
+      "command": "sudo apt update && sudo apt upgrade -y"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-install-linux-1",
+      "text": "Why is Linux preferred over Windows for a home server?",
+      "options": [
+        "Linux has better gaming support",
+        "Linux is free, open-source, stable, and has excellent networking and server support",
+        "Linux comes pre-installed on most hardware",
+        "Linux does not require any updates"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "id": "q-install-linux-2",
+      "text": "What does the 'dd' command do when creating a bootable USB?",
+      "options": [
+        "It downloads the ISO file from the internet",
+        "It formats the USB drive to NTFS",
+        "It copies the ISO image byte-by-byte to the USB device",
+        "It installs Linux directly onto the server"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "id": "q-install-linux-3",
+      "text": "Why is it critical to identify the correct device before running dd?",
+      "options": [
+        "dd will not work on the wrong device",
+        "dd overwrites the target device completely — selecting the wrong one could destroy your system",
+        "The wrong device will be too slow",
+        "dd requires a specific device name format"
+      ],
+      "correctIndex": 1
+    }
+  ]
+}
