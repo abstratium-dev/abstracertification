@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, AfterViewChecked, inject, afterNextRender, Injector } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
-import mermaid from 'mermaid';
+import { MarkdownComponent, type MermaidAPI } from 'ngx-markdown';
 import { CertificationService } from './certification.service';
 import { ThemeService } from '../theme.service';
 import {
@@ -18,15 +18,11 @@ export interface WizardStep {
 
 @Component({
   selector: 'wizard',
-  imports: [CommonModule],
+  imports: [CommonModule, MarkdownComponent],
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.scss',
 })
-export class WizardComponent implements OnInit, OnDestroy, AfterViewChecked {
-  private mermaidInitialized = false;
-  private mermaidRendering = false;
-  private lastRenderedStepIndex = -1;
-  private pendingRender = false;
+export class WizardComponent implements OnInit, OnDestroy {
   module: CertificationModule | null = null;
   steps: WizardStep[] = [];
   currentStepIndex = 0;
@@ -39,13 +35,16 @@ export class WizardComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   choiceSelections: Map<string, Set<number>> = new Map();
   shuffledQuestions: Map<string, Question[]> = new Map();
+  infoExpandedState: Map<string, boolean> = new Map();
 
   fontSize: 'small' | 'medium' | 'large' = 'medium';
 
   private routeSub: Subscription | null = null;
-
   private themeService = inject(ThemeService);
-  private injector = inject(Injector);
+
+  readonly mermaidOptions = computed((): MermaidAPI.MermaidConfig =>
+    ({ theme: this.themeService.theme$() === 'dark' ? 'dark' : 'default' })
+  );
 
   constructor(
     private certificationService: CertificationService,
@@ -61,76 +60,6 @@ export class WizardComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnDestroy(): void {
     this.routeSub?.unsubscribe();
-  }
-
-  ngAfterViewChecked(): void {
-    // Only render if we're on a new step and not already rendering
-    if (this.currentStepIndex !== this.lastRenderedStepIndex && !this.mermaidRendering && !this.pendingRender) {
-      this.pendingRender = true;
-      // Use afterNextRender to ensure DOM is fully updated
-      afterNextRender(() => {
-        this.renderMermaidDiagrams();
-        this.pendingRender = false;
-      }, { injector: this.injector });
-    }
-  }
-
-  private async renderMermaidDiagrams(): Promise<void> {
-    if (this.mermaidRendering) return;
-
-    // Find unrendered mermaid elements
-    const elements = document.querySelectorAll('.mermaid:not([data-processed="true"])');
-    console.debug('[Mermaid] Found', elements.length, 'unrendered elements');
-    if (elements.length === 0) {
-      this.lastRenderedStepIndex = this.currentStepIndex;
-      return;
-    }
-
-    this.mermaidRendering = true;
-
-    if (!this.mermaidInitialized) {
-      const currentTheme = this.themeService.theme$();
-      const mermaidTheme = currentTheme === 'dark' ? 'dark' : 'default';
-      mermaid.initialize({ startOnLoad: false, theme: mermaidTheme, securityLevel: 'loose' });
-      this.mermaidInitialized = true;
-      console.debug('[Mermaid] Initialized with theme:', mermaidTheme);
-    }
-
-    // Small delay for DOM to stabilize
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    try {
-      for (let i = 0; i < elements.length; i++) {
-        const element = elements[i] as HTMLElement;
-        const graphDefinition = element.getAttribute('data-diagram') || '';
-        console.debug('[Mermaid] Rendering diagram', i, 'length:', graphDefinition.length);
-        if (!graphDefinition.trim()) {
-          console.warn('[Mermaid] Empty diagram definition');
-          continue;
-        }
-
-        const id = `mermaid-${this.currentStepIndex}-${i}`;
-        console.debug('[Mermaid] Calling render with id:', id);
-        const { svg } = await mermaid.render(id, graphDefinition);
-        console.debug('[Mermaid] Rendered SVG length:', svg.length);
-        element.innerHTML = svg;
-        element.setAttribute('data-processed', 'true');
-        console.debug('[Mermaid] SVG inserted into DOM');
-      }
-      this.lastRenderedStepIndex = this.currentStepIndex;
-    } catch (e) {
-      console.error('[Mermaid] Render error:', e);
-      // Show error message in the diagram container
-      for (let i = 0; i < elements.length; i++) {
-        const element = elements[i] as HTMLElement;
-        if (!element.hasAttribute('data-processed')) {
-          element.innerHTML = '<div style="color: var(--color-error); padding: 1rem;">Failed to render diagram</div>';
-          element.setAttribute('data-processed', 'true');
-        }
-      }
-    } finally {
-      this.mermaidRendering = false;
-    }
   }
 
   private loadModule(moduleId: string): void {
@@ -179,6 +108,8 @@ export class WizardComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.selectedAnswers.set(q.id, null);
     }
     this.shuffledQuestions.set(page.id, this.shuffleArray([...page.questions]));
+    // Initialize info expanded state from page config (default to true if not specified)
+    this.infoExpandedState.set(page.id, page.infoExpanded ?? true);
   }
 
   private shuffleArray<T>(array: T[]): T[] {
@@ -487,5 +418,16 @@ export class WizardComponent implements OnInit, OnDestroy, AfterViewChecked {
   decreaseFontSize(): void {
     if (this.fontSize === 'large') this.fontSize = 'medium';
     else if (this.fontSize === 'medium') this.fontSize = 'small';
+  }
+
+  // --- Info section handling ---
+
+  isInfoExpanded(pageId: string): boolean {
+    return this.infoExpandedState.get(pageId) ?? true;
+  }
+
+  toggleInfoExpanded(pageId: string): void {
+    const current = this.infoExpandedState.get(pageId) ?? true;
+    this.infoExpandedState.set(pageId, !current);
   }
 }

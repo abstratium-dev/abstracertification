@@ -9,6 +9,8 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
+- fix budgets in angular.json -> 5.5 mb is WAY to big
+- randomize the answers, not just the questions
 - add copyright notices to the source files
 - create a markdown document in the docs folder to describe the certification modules that can be added to the webui/public folder which describes the way in which you can configure modules and their pages including all the options that exist. it should act as a specification for future engineers and LLMs.
 - move wizard which is in core back up to abstracore
@@ -29,6 +31,8 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
     - nginx rate limiting
     - etc.
   - wireguard vpn (peer to peer but as "client" and "server")
+  - SSL with certbot from letsencrypt
+    - including how to make it so that they are auto updated
 
 
 - [ ] - Update SECURITY_DESIGN.md with project-specific information

@@ -46,6 +46,7 @@ export interface CertificationPage {
   title: string;
   why: string;
   info?: InfoItem[];
+  infoExpanded?: boolean;
   instructions: InstructionStep[];
   questions: Question[];
 }

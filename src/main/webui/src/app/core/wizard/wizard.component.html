@@ -95,8 +95,13 @@
 
     <!-- INFO section -->
     <section class="info-section" *ngIf="currentPage.info && currentPage.info.length > 0">
-      <h3>Key Concepts</h3>
-      <div class="info-box">
+      <div class="info-header" (click)="toggleInfoExpanded(currentPage.id)">
+        <h3>Key Concepts<span *ngIf="!isInfoExpanded(currentPage.id)" class="click-hint"> (click here to open)</span></h3>
+        <button type="button" class="toggle-btn" [attr.aria-expanded]="isInfoExpanded(currentPage.id)">
+          <span class="toggle-icon" [class.expanded]="isInfoExpanded(currentPage.id)">▼</span>
+        </button>
+      </div>
+      <div class="info-box" *ngIf="isInfoExpanded(currentPage.id)">
         <dl class="info-list">
           <div *ngFor="let item of currentPage.info" class="info-item">
             <dt class="info-term">{{ item.term }}</dt>
@@ -113,7 +118,7 @@
         <li *ngFor="let step of currentPage.instructions" class="instruction-step">
           <p class="step-text">{{ step.text }}</p>
           <div *ngIf="step.mermaid" class="mermaid-diagram">
-            <div class="mermaid" [attr.data-diagram]="step.mermaid"></div>
+            <markdown mermaid [mermaidOptions]="mermaidOptions()" [data]="'```mermaid\n' + step.mermaid + '\n```'"></markdown>
           </div>
           <code *ngIf="step.command" class="step-command">{{ step.command }}</code>
           <p *ngIf="step.note" class="step-note">{{ step.note }}</p>

@@ -2,7 +2,7 @@
   "name": "abstracertification",
   "version": "0.0.0",
   "engines": {
-    "node": ">=20.19.0 || >=22.12.0",
+    "node": ">=20.18.0 || >=22.12.0",
     "npm": ">=10.0.0"
   },
   "scripts": {
@@ -24,6 +24,7 @@
     "@angular/platform-browser-dynamic": "^21.1.3",
     "@angular/router": "^21.1.3",
     "mermaid": "^11.14.0",
+    "ngx-markdown": "^21.3.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

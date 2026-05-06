@@ -2,6 +2,7 @@
   "id": "intro",
   "title": "Welcome to Your Home Server Journey",
   "why": "Imagine having your own piece of the internet — a server that lives in your home, runs exactly what you want, and is accessible from anywhere in the world using your own domain name. This guide will walk you through building that reality: a secure Linux server that you can reach remotely via SSH, protected by a firewall so that even if someone gained access to your home network, they would be severely limited in what they can do. You will learn to install Ubuntu Server, configure Nginx as your web server, lock down access with UFW firewall, harden SSH for secure remote management, configure your router for external access, and set up dynamic DNS so your server is always reachable by name. By the end, you will have a production-ready server that is yours alone — no cloud provider, no monthly fees, full control.",
+  "infoExpanded": false,
   "info": [
     {
       "term": "SSH",
@@ -19,7 +20,7 @@
   "instructions": [
     {
       "text": "This is what you will build — a secure home network with your own internet-accessible server:",
-      "mermaid": "graph TB\n    subgraph Internet ['Internet']\n        internetUser([Internet User])\n    end\n\n    subgraph HomeNetwork ['Home Network (192.168.1.x)']\n        desktopUser([Desktop User])\n        desktop[Desktop/Laptop<br/>Browse Web on :80/:443<br/>SSH Connect on :2222]\n        router[Router<br/>Port Forwarding<br/>:80  :443  :2222]\n        server[Linux Server<br/>Serve Websites on :80/:443<br/>Accept SSH on :2222<br/>UFW Firewall]\n    end\n\n    internetUser -->|Access Website| router\n    internetUser -->|SSH Remote Mgmt| router\n    router -->|Forward :80/:443| server\n    router -->|Forward :2222| server\n    desktopUser -->|Configure Server| desktop\n    desktop -->|SSH Admin on :2222| server\n    desktop -->|View Website on :80| server"
+      "mermaid": "graph TB\n    subgraph Internet [\"Internet\"]\n        internetUser([Internet User])\n    end\n\n    subgraph HomeNetwork [\"Home Network 192.168.1.x\"]\n        desktopUser([Desktop User])\n        desktop[Desktop/Laptop<br/>Browse Web on :80/:443<br/>SSH Connect on :2222]\n        router[Router<br/>Port Forwarding<br/>:80 :443 :2222]\n        server[Linux Server<br/>Serve Websites on :80/:443<br/>Accept SSH on :2222<br/>UFW Firewall]\n    end\n\n    internetUser -->|Access Website| router\n    internetUser -->|SSH Remote Mgmt| router\n    router -->|Forward :80/:443| server\n    router -->|Forward :2222| server\n    desktopUser -->|Configure Server| desktop\n    desktop -->|SSH Admin on :2222| server\n    desktop -->|View Website on :80| server"
     },
     {
       "text": "This certification is designed to be completed hands-on. You will need: a spare computer or Raspberry Pi to act as your server, a USB drive (4GB+), and access to your home router's admin interface."

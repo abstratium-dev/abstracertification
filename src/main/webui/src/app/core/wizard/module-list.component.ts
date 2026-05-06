@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { CertificationService } from './certification.service';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CertificationModuleIndex } from './certification.model';
+import { CertificationService } from './certification.service';
 
 interface ModuleInfo {
   id: string;
@@ -13,7 +13,7 @@ interface ModuleInfo {
 
 @Component({
   selector: 'module-list',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './module-list.component.html',
   styleUrl: './module-list.component.scss',
 })

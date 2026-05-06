@@ -2,6 +2,7 @@ import { HttpClient, provideHttpClient, withXsrfConfiguration } from '@angular/c
 import { ApplicationConfig, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { MERMAID_OPTIONS, provideMarkdown } from 'ngx-markdown';
 
 import { routes } from './app.routes';
 import { AuthService } from './core/auth.service';
@@ -27,5 +28,6 @@ export const appConfig: ApplicationConfig = {
       // Convert Observable to Promise so Angular waits for initialization
       return firstValueFrom(authService.initialize());
     }),
+    provideMarkdown({ mermaidOptions: { provide: MERMAID_OPTIONS, useValue: { startOnLoad: false } } }),
   ]
 };
