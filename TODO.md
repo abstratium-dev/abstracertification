@@ -9,6 +9,11 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
+- make wizard in core more abstract
+- only the bakckend file should know which answers are correct.
+- persistence for when answers are sent, IF the user is signed in
+- remove files and stick them in the db and initial load from a folder and keep the content private rather than open source
+  - no do that thing in git where a different repo is pulled for content of a folder
 - fix budgets in angular.json -> 5.5 mb is WAY to big
 - randomize the answers, not just the questions
 - add copyright notices to the source files

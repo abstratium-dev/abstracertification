@@ -1,0 +1,12 @@
+<wizard *ngIf="!loading() && !error() && definition()"
+  [definition]="definition()"
+  (submitAnswers)="onSubmitAnswers($event)"></wizard>
+
+<div *ngIf="loading()" class="loading">
+  <p>Loading certification...</p>
+</div>
+
+<div *ngIf="error()" class="error-message">
+  <h2>Error</h2>
+  <p>{{ error() }}</p>
+</div>

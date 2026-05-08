@@ -1,8 +1,8 @@
-<div class="wizard-container" *ngIf="!loading && !error && module">
+<div class="wizard-container" *ngIf="definition">
   <!-- Header -->
   <div class="wizard-header">
-    <h1>{{ module.title }}</h1>
-    <p class="description">{{ module.description }}</p>
+    <h1>{{ definition.title }}</h1>
+    <p class="description">{{ definition.description }}</p>
 
     <!-- Font size controls -->
     <div class="font-size-controls">
@@ -35,12 +35,12 @@
   <!-- Step navigation dots -->
   <div class="wizard-nav">
     <button
-      *ngFor="let step of steps; let i = index"
+      *ngFor="let resolved of resolvedSteps; let i = index"
       class="nav-dot"
       [class.active]="i === currentStepIndex"
-      [class.completed]="isStepCompleted(i)"
+      [class.completed]="isResolvedStepCompleted(i)"
       [class.accessible]="isStepAccessible(i)"
-      [class.choice-dot]="step.type === 'choice'"
+      [class.choice-dot]="resolved.type === 'choice'"
       [disabled]="!isStepAccessible(i)"
       (click)="goToStep(i)"
       [title]="getStepLabel(i)">
@@ -83,27 +83,27 @@
     </div>
   </div>
 
-  <!-- Page step -->
-  <div class="wizard-page" [class.font-small]="fontSize === 'small'" [class.font-large]="fontSize === 'large'" *ngIf="currentPage">
-    <h2 class="page-title">{{ currentPage.title }}</h2>
+  <!-- Step content -->
+  <div class="wizard-page" [class.font-small]="fontSize === 'small'" [class.font-large]="fontSize === 'large'" *ngIf="currentStep">
+    <h2 class="page-title">{{ currentStep.title }}</h2>
 
     <!-- WHY section -->
     <section class="why-section">
       <h3>Why?</h3>
-      <p>{{ currentPage.why }}</p>
+      <p>{{ currentStep.why }}</p>
     </section>
 
     <!-- INFO section -->
-    <section class="info-section" *ngIf="currentPage.info && currentPage.info.length > 0">
-      <div class="info-header" (click)="toggleInfoExpanded(currentPage.id)">
-        <h3>Key Concepts<span *ngIf="!isInfoExpanded(currentPage.id)" class="click-hint"> (click here to open)</span></h3>
-        <button type="button" class="toggle-btn" [attr.aria-expanded]="isInfoExpanded(currentPage.id)">
-          <span class="toggle-icon" [class.expanded]="isInfoExpanded(currentPage.id)">▼</span>
+    <section class="info-section" *ngIf="currentStep.infoItems && currentStep.infoItems.length > 0">
+      <div class="info-header" (click)="toggleInfoExpanded(currentStep.id)">
+        <h3>Key Concepts<span *ngIf="!isInfoExpanded(currentStep.id)" class="click-hint"> (click here to open)</span></h3>
+        <button type="button" class="toggle-btn" [attr.aria-expanded]="isInfoExpanded(currentStep.id)">
+          <span class="toggle-icon" [class.expanded]="isInfoExpanded(currentStep.id)">&#9660;</span>
         </button>
       </div>
-      <div class="info-box" *ngIf="isInfoExpanded(currentPage.id)">
+      <div class="info-box" *ngIf="isInfoExpanded(currentStep.id)">
         <dl class="info-list">
-          <div *ngFor="let item of currentPage.info" class="info-item">
+          <div *ngFor="let item of currentStep.infoItems" class="info-item">
             <dt class="info-term">{{ item.term }}</dt>
             <dd class="info-description">{{ item.description }}</dd>
           </div>
@@ -115,13 +115,13 @@
     <section class="instructions-section">
       <h3>What to do</h3>
       <ol class="instruction-list">
-        <li *ngFor="let step of currentPage.instructions" class="instruction-step">
-          <p class="step-text">{{ step.text }}</p>
-          <div *ngIf="step.mermaid" class="mermaid-diagram">
-            <markdown mermaid [mermaidOptions]="mermaidOptions()" [data]="'```mermaid\n' + step.mermaid + '\n```'"></markdown>
+        <li *ngFor="let instr of currentStep.instructions" class="instruction-step">
+          <p class="step-text">{{ instr.text }}</p>
+          <div *ngIf="instr.mermaid" class="mermaid-diagram">
+            <markdown mermaid [mermaidOptions]="mermaidOptions()" [data]="'```mermaid\n' + instr.mermaid + '\n```'"></markdown>
           </div>
-          <code *ngIf="step.command" class="step-command">{{ step.command }}</code>
-          <p *ngIf="step.note" class="step-note">{{ step.note }}</p>
+          <code *ngIf="instr.command" class="step-command">{{ instr.command }}</code>
+          <p *ngIf="instr.note" class="step-note">{{ instr.note }}</p>
         </li>
       </ol>
     </section>
@@ -137,27 +137,26 @@
 
         <div class="options-list">
           <label
-            *ngFor="let option of question.options; let oi = index"
+            *ngFor="let option of question.options"
             class="option-label"
-            [class.selected]="!pageSubmitted && getSelectedAnswer(question.id) === oi"
-            [class.correct]="pageSubmitted && isOptionCorrect(question, oi)"
-            [class.incorrect]="pageSubmitted && getSelectedAnswer(question.id) === oi && !isOptionCorrect(question, oi)"
+            [class.selected]="!pageSubmitted && getSelectedAnswer(question.id) === option.id"
+            [class.incorrect]="pageSubmitted && isSelectedOptionWrong(question.id, option.id)"
             [class.disabled]="pageSubmitted">
             <input
               type="radio"
               [name]="question.id"
-              [value]="oi"
-              [checked]="getSelectedAnswer(question.id) === oi"
+              [value]="option.id"
+              [checked]="getSelectedAnswer(question.id) === option.id"
               [disabled]="pageSubmitted"
-              (change)="selectAnswer(question, oi)">
-            <span class="option-text">{{ option }}</span>
+              (change)="selectAnswer(question, option.id)">
+            <span class="option-text">{{ option.text }}</span>
           </label>
         </div>
 
         <div class="question-feedback" *ngIf="pageSubmitted">
           <p *ngIf="isCorrect(question)" class="feedback-correct">Correct!</p>
           <p *ngIf="!isCorrect(question)" class="feedback-incorrect">
-            Incorrect. The correct answer is: {{ question.options[question.correctIndex] }}
+            Incorrect. Try again.
           </p>
         </div>
       </div>
@@ -166,9 +165,9 @@
       <div class="submit-section" *ngIf="!pageSubmitted">
         <button
           class="btn-primary"
-          [disabled]="!allQuestionsSelected"
+          [disabled]="!allQuestionsSelected || submitting"
           (click)="submitPage()">
-          Submit Answers
+          {{ submitting ? 'Checking...' : 'Submit Answers' }}
         </button>
       </div>
     </section>
@@ -184,19 +183,9 @@
       <button class="btn-secondary" [disabled]="!canGoPrev" (click)="goPrev()">Previous</button>
       <button class="btn-primary" *ngIf="currentStepIndex < totalSteps - 1" [disabled]="!canGoNext" (click)="goNext()">Next</button>
       <span *ngIf="currentStepIndex === totalSteps - 1 && currentStepCompleted" class="completion-message">
-        Congratulations! You have completed this certification module.
+        Congratulations! You have completed all steps.
       </span>
     </div>
   </div>
 </div>
 
-<!-- Loading state -->
-<div *ngIf="loading" class="loading">
-  <p>Loading certification module...</p>
-</div>
-
-<!-- Error state -->
-<div *ngIf="error" class="error-message">
-  <h2>Error</h2>
-  <p>{{ error }}</p>
-</div>

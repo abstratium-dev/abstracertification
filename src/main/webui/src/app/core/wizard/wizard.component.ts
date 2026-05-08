@@ -1,115 +1,111 @@
-import { Component, OnInit, OnDestroy, inject, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { MarkdownComponent, type MermaidAPI } from 'ngx-markdown';
-import { CertificationService } from './certification.service';
 import { ThemeService } from '../theme.service';
 import {
-  CertificationModule, CertificationPage, PageState, Question,
-  PageChoice, PageEntry
-} from './certification.model';
+  WizardDefinition, WizardStep, WizardChoicePoint, WizardEntry,
+  WizardPageState, WizardQuestion, WizardAnswerResults
+} from './wizard.model';
 
-export interface WizardStep {
-  type: 'page' | 'choice';
-  page?: CertificationPage;
-  choice?: PageChoice;
+/**
+ * Internal representation of a resolved entry in the wizard flow.
+ * Either a content step or a choice point, determined by {@link type}.
+ */
+export interface ResolvedWizardStep {
+  type: 'step' | 'choice';
+  step?: WizardStep;
+  choice?: WizardChoicePoint;
 }
 
+/**
+ * Generic, reusable wizard UI component.
+ * Accepts a {@link WizardDefinition} via @Input() and manages all UI state:
+ * step navigation, progress tracking, choice selection, question answering,
+ * and font size preferences. Contains no HTTP calls or domain-specific logic.
+ */
 @Component({
   selector: 'wizard',
   imports: [CommonModule, MarkdownComponent],
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.scss',
 })
-export class WizardComponent implements OnInit, OnDestroy {
-  module: CertificationModule | null = null;
-  steps: WizardStep[] = [];
+export class WizardComponent implements OnChanges {
+  @Input() definition: WizardDefinition | null = null;
+
+  /** Emits when the user clicks "Submit Answers" — payload is questionId -> selected option ID. */
+  @Output() submitAnswers = new EventEmitter<Map<string, string>>();
+
+  resolvedSteps: ResolvedWizardStep[] = [];
   currentStepIndex = 0;
-  pageStates: Map<string, PageState> = new Map();
-  selectedAnswers: Map<string, number | null> = new Map();
+  pageStates: Map<string, WizardPageState> = new Map();
+  /** Tracks selected option ID per question. */
+  selectedAnswers: Map<string, string | null> = new Map();
   answeredQuestions: Set<string> = new Set();
   pageSubmitted = false;
-  loading = true;
-  error: string | null = null;
+  submitting = false;
+
+  /** Backend answer check results per step: stepId -> (questionId -> correct). */
+  answerResultsByStep: Map<string, WizardAnswerResults> = new Map();
 
   choiceSelections: Map<string, Set<number>> = new Map();
-  shuffledQuestions: Map<string, Question[]> = new Map();
+  shuffledQuestions: Map<string, WizardQuestion[]> = new Map();
   infoExpandedState: Map<string, boolean> = new Map();
 
   fontSize: 'small' | 'medium' | 'large' = 'medium';
 
-  private routeSub: Subscription | null = null;
   private themeService = inject(ThemeService);
 
   readonly mermaidOptions = computed((): MermaidAPI.MermaidConfig =>
     ({ theme: this.themeService.theme$() === 'dark' ? 'dark' : 'default' })
   );
 
-  constructor(
-    private certificationService: CertificationService,
-    private route: ActivatedRoute,
-  ) {}
-
-  ngOnInit(): void {
-    this.routeSub = this.route.paramMap.subscribe((params: ParamMap) => {
-      const moduleId = params.get('moduleId') ?? 'linux-home-server';
-      this.loadModule(moduleId);
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.routeSub?.unsubscribe();
-  }
-
-  private loadModule(moduleId: string): void {
-    this.loading = true;
-    this.error = null;
-    this.certificationService.loadModule(moduleId).subscribe({
-      next: (mod: CertificationModule) => {
-        this.module = mod;
-        this.loading = false;
-        this.buildSteps();
-      },
-      error: (err: Error) => {
-        this.error = `Failed to load certification module: ${err.message}`;
-        this.loading = false;
-      }
-    });
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['definition'] && this.definition) {
+      this.buildSteps();
+    }
   }
 
   private buildSteps(): void {
-    if (!this.module) return;
-    this.steps = [];
+    if (!this.definition) return;
+    this.resolvedSteps = [];
     this.choiceSelections.clear();
     this.pageStates.clear();
     this.selectedAnswers.clear();
     this.answeredQuestions.clear();
     this.currentStepIndex = 0;
     this.pageSubmitted = false;
+    this.submitting = false;
+    this.answerResultsByStep.clear();
 
-    let pageIndex = 0;
-    for (const entry of this.module.pageEntries) {
+    let stepIndex = 0;
+    for (const entry of this.definition.entries) {
       if (typeof entry === 'string') {
-        const page = this.module.pages[pageIndex++];
-        this.steps.push({ type: 'page', page });
-        this.initPageState(page);
+        const step = this.definition.steps[stepIndex++];
+        this.resolvedSteps.push({ type: 'step', step });
+        this.initStepState(step);
       } else {
-        const choice = entry as PageChoice;
-        this.steps.push({ type: 'choice', choice });
+        const choice = entry as WizardChoicePoint;
+        this.resolvedSteps.push({ type: 'choice', choice });
         this.choiceSelections.set(choice.label, new Set());
       }
     }
   }
 
-  private initPageState(page: CertificationPage): void {
-    this.pageStates.set(page.id, { answers: new Map(), completed: false });
-    for (const q of page.questions) {
+  private initStepState(step: WizardStep): void {
+    this.pageStates.set(step.id, { answers: new Map(), completed: false });
+    for (const q of step.questions) {
       this.selectedAnswers.set(q.id, null);
     }
-    this.shuffledQuestions.set(page.id, this.shuffleArray([...page.questions]));
-    // Initialize info expanded state from page config (default to true if not specified)
-    this.infoExpandedState.set(page.id, page.infoExpanded ?? true);
+    this.shuffledQuestions.set(step.id, this.shuffleWithOptions([...step.questions]));
+    this.infoExpandedState.set(step.id, step.infoExpanded ?? true);
+  }
+
+  /** Shuffles questions AND randomizes option order within each question. */
+  private shuffleWithOptions(questions: WizardQuestion[]): WizardQuestion[] {
+    return this.shuffleArray(questions).map(q => ({
+      ...q,
+      options: this.shuffleArray([...q.options])
+    }));
   }
 
   private shuffleArray<T>(array: T[]): T[] {
@@ -121,34 +117,34 @@ export class WizardComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  isChoiceStep(step: WizardStep): boolean {
-    return step.type === 'choice';
+  isChoiceStep(resolved: ResolvedWizardStep): boolean {
+    return resolved.type === 'choice';
+  }
+
+  get currentResolvedStep(): ResolvedWizardStep | null {
+    return this.resolvedSteps[this.currentStepIndex] ?? null;
   }
 
   get currentStep(): WizardStep | null {
-    return this.steps[this.currentStepIndex] ?? null;
+    const resolved = this.currentResolvedStep;
+    if (!resolved || resolved.type !== 'step') return null;
+    return resolved.step ?? null;
   }
 
-  get currentPage(): CertificationPage | null {
+  get currentQuestions(): WizardQuestion[] {
     const step = this.currentStep;
-    if (!step || step.type !== 'page') return null;
-    return step.page ?? null;
+    if (!step) return [];
+    return this.shuffledQuestions.get(step.id) ?? step.questions;
   }
 
-  get currentQuestions(): Question[] {
-    const page = this.currentPage;
-    if (!page) return [];
-    return this.shuffledQuestions.get(page.id) ?? page.questions;
-  }
-
-  get currentChoice(): PageChoice | null {
-    const step = this.currentStep;
-    if (!step || step.type !== 'choice') return null;
-    return step.choice ?? null;
+  get currentChoice(): WizardChoicePoint | null {
+    const resolved = this.currentResolvedStep;
+    if (!resolved || resolved.type !== 'choice') return null;
+    return resolved.choice ?? null;
   }
 
   get totalSteps(): number {
-    return this.steps.length;
+    return this.resolvedSteps.length;
   }
 
   get progressPercent(): number {
@@ -157,20 +153,20 @@ export class WizardComponent implements OnInit, OnDestroy {
   }
 
   get currentStepCompleted(): boolean {
-    const step = this.currentStep;
-    if (!step) return false;
-    if (step.type === 'choice') {
-      return this.isChoiceSelectionMade(step.choice!);
+    const resolved = this.currentResolvedStep;
+    if (!resolved) return false;
+    if (resolved.type === 'choice') {
+      return this.isChoiceSelectionMade(resolved.choice!);
     }
-    const page = step.page!;
-    return page.questions.every(q => this.answeredQuestions.has(q.id) && this.isCorrect(q));
+    const step = resolved.step!;
+    return step.questions.every(q => this.answeredQuestions.has(q.id) && this.isCorrect(q));
   }
 
   get canGoNext(): boolean {
     return this.currentStepCompleted && this.currentStepIndex < this.totalSteps - 1;
   }
 
-  isChoiceSelectionMade(choice: PageChoice): boolean {
+  isChoiceSelectionMade(choice: WizardChoicePoint): boolean {
     const selected = this.choiceSelections.get(choice.label);
     if (!selected) return false;
     return selected.size >= choice.minRequired;
@@ -182,16 +178,15 @@ export class WizardComponent implements OnInit, OnDestroy {
 
   // --- Choice handling ---
 
-  isChoiceCompleted(choice: PageChoice): boolean {
+  isChoiceCompleted(choice: WizardChoicePoint): boolean {
     const selected = this.choiceSelections.get(choice.label);
     if (!selected) return false;
     if (selected.size < choice.minRequired) return false;
-    // All selected variant pages must be completed
     for (const variantIdx of selected) {
-      const variantPages = this.module!.choicePages.get(choice.label);
-      if (!variantPages) return false;
-      const page = variantPages[variantIdx];
-      if (!page.questions.every(q => this.answeredQuestions.has(q.id) && this.isCorrect(q))) {
+      const variantSteps = this.definition!.choiceSteps.get(choice.label);
+      if (!variantSteps) return false;
+      const step = variantSteps[variantIdx];
+      if (!step.questions.every(q => this.answeredQuestions.has(q.id) && this.isCorrect(q))) {
         return false;
       }
     }
@@ -209,7 +204,6 @@ export class WizardComponent implements OnInit, OnDestroy {
       this.removeVariantSteps(choiceLabel, variantIndex);
     } else {
       if (choice.maxRequired === 1) {
-        // Single select — clear previous and remove its steps
         for (const prevIdx of selected) {
           this.removeVariantSteps(choiceLabel, prevIdx);
         }
@@ -230,70 +224,67 @@ export class WizardComponent implements OnInit, OnDestroy {
     return this.choiceSelections.get(choiceLabel)?.size ?? 0;
   }
 
-  private getChoiceByLabel(label: string): PageChoice | null {
-    if (!this.module) return null;
-    for (const entry of this.module.pageEntries) {
-      if (typeof entry !== 'string' && (entry as PageChoice).label === label) {
-        return entry as PageChoice;
+  private getChoiceByLabel(label: string): WizardChoicePoint | null {
+    if (!this.definition) return null;
+    for (const entry of this.definition.entries) {
+      if (typeof entry !== 'string' && (entry as WizardChoicePoint).label === label) {
+        return entry as WizardChoicePoint;
       }
     }
     return null;
   }
 
   private getChoiceStepIndex(choiceLabel: string): number {
-    return this.steps.findIndex(s => s.type === 'choice' && s.choice?.label === choiceLabel);
+    return this.resolvedSteps.findIndex(s => s.type === 'choice' && s.choice?.label === choiceLabel);
   }
 
   private insertVariantStep(choiceLabel: string, variantIndex: number): void {
     const choiceStepIdx = this.getChoiceStepIndex(choiceLabel);
     if (choiceStepIdx < 0) return;
-    const variantPages = this.module!.choicePages.get(choiceLabel);
-    if (!variantPages) return;
-    const page = variantPages[variantIndex];
+    const variantSteps = this.definition!.choiceSteps.get(choiceLabel);
+    if (!variantSteps) return;
+    const step = variantSteps[variantIndex];
 
-    // Insert right after the choice step (or after other already-inserted variants)
     let insertAt = choiceStepIdx + 1;
-    while (insertAt < this.steps.length && this.steps[insertAt].type === 'page' &&
-           this.isVariantPage(this.steps[insertAt], choiceLabel)) {
+    while (insertAt < this.resolvedSteps.length && this.resolvedSteps[insertAt].type === 'step' &&
+           this.isVariantStep(this.resolvedSteps[insertAt], choiceLabel)) {
       insertAt++;
     }
-    this.steps.splice(insertAt, 0, { type: 'page', page });
-    this.initPageState(page);
+    this.resolvedSteps.splice(insertAt, 0, { type: 'step', step });
+    this.initStepState(step);
   }
 
   private removeVariantSteps(choiceLabel: string, variantIndex: number): void {
-    const variantPages = this.module!.choicePages.get(choiceLabel);
-    if (!variantPages) return;
-    const page = variantPages[variantIndex];
+    const variantSteps = this.definition!.choiceSteps.get(choiceLabel);
+    if (!variantSteps) return;
+    const step = variantSteps[variantIndex];
 
-    const idx = this.steps.findIndex(s => s.type === 'page' && s.page?.id === page.id);
+    const idx = this.resolvedSteps.findIndex(s => s.type === 'step' && s.step?.id === step.id);
     if (idx >= 0) {
-      this.steps.splice(idx, 1);
-      // Clean up state for removed page
-      for (const q of page.questions) {
+      this.resolvedSteps.splice(idx, 1);
+      for (const q of step.questions) {
         this.selectedAnswers.delete(q.id);
         this.answeredQuestions.delete(q.id);
       }
-      this.pageStates.delete(page.id);
-      // Adjust current index if needed
-      if (this.currentStepIndex >= this.steps.length) {
-        this.currentStepIndex = this.steps.length - 1;
+      this.pageStates.delete(step.id);
+      if (this.currentStepIndex >= this.resolvedSteps.length) {
+        this.currentStepIndex = this.resolvedSteps.length - 1;
       }
     }
   }
 
-  private isVariantPage(step: WizardStep, choiceLabel: string): boolean {
-    if (step.type !== 'page' || !step.page) return false;
-    const variantPages = this.module!.choicePages.get(choiceLabel);
-    if (!variantPages) return false;
-    return variantPages.some(p => p.id === step.page!.id);
+  private isVariantStep(resolved: ResolvedWizardStep, choiceLabel: string): boolean {
+    if (resolved.type !== 'step' || !resolved.step) return false;
+    const variantSteps = this.definition!.choiceSteps.get(choiceLabel);
+    if (!variantSteps) return false;
+    return variantSteps.some(s => s.id === resolved.step!.id);
   }
 
   // --- Question handling ---
 
-  selectAnswer(question: Question, optionIndex: number): void {
+  selectAnswer(question: WizardQuestion, optionId: string): void {
     if (this.pageSubmitted) return;
-    this.selectedAnswers.set(question.id, optionIndex);
+    this.selectedAnswers.set(question.id, optionId);
   }
 
   get allQuestionsSelected(): boolean {
@@ -303,14 +294,39 @@ export class WizardComponent implements OnInit, OnDestroy {
   }
 
   submitPage(): void {
-    if (this.pageSubmitted) return;
+    if (this.pageSubmitted || this.submitting) return;
+    this.submitting = true;
+
+    // Build the answers map (questionId -> selected option ID) for current step
+    const answers = new Map<string, string>();
+    for (const q of this.currentQuestions) {
+      const selected = this.selectedAnswers.get(q.id);
+      if (selected) {
+        answers.set(q.id, selected);
+      }
+    }
+
+    // Emit to parent for backend validation
+    this.submitAnswers.emit(answers);
+  }
+
+  /**
+   * Called by the parent component after receiving backend results.
+   * Applies the results and marks the page as submitted.
+   */
+  applyAnswerResults(results: WizardAnswerResults): void {
+    const step = this.currentStep;
+    if (step) {
+      this.answerResultsByStep.set(step.id, results);
+    }
     this.pageSubmitted = true;
+    this.submitting = false;
     for (const q of this.currentQuestions) {
       this.answeredQuestions.add(q.id);
     }
   }
 
-  getSelectedAnswer(questionId: string): number | null {
+  getSelectedAnswer(questionId: string): string | null {
     return this.selectedAnswers.get(questionId) ?? null;
   }
 
@@ -318,12 +334,25 @@ export class WizardComponent implements OnInit, OnDestroy {
     return this.answeredQuestions.has(questionId);
   }
 
-  isCorrect(question: Question): boolean {
-    return this.selectedAnswers.get(question.id) === question.correctIndex;
+  /** Returns true if the backend reported this question as correctly answered. */
+  isCorrect(question: WizardQuestion): boolean {
+    for (const [, results] of this.answerResultsByStep) {
+      if (results.has(question.id)) {
+        return results.get(question.id) === true;
+      }
+    }
+    return false;
   }
 
-  isOptionCorrect(question: Question, optionIndex: number): boolean {
-    return optionIndex === question.correctIndex;
+  /** Returns true if the selected option for this question is the one that was marked wrong. */
+  isSelectedOptionWrong(questionId: string, optionId: string): boolean {
+    for (const [, results] of this.answerResultsByStep) {
+      if (results.has(questionId)) {
+        const isWrong = results.get(questionId) === false;
+        return isWrong && this.selectedAnswers.get(questionId) === optionId;
+      }
+    }
+    return false;
   }
 
   // --- Navigation ---
@@ -339,9 +368,9 @@ export class WizardComponent implements OnInit, OnDestroy {
   goPrev(): void {
     if (this.canGoPrev) {
       this.currentStepIndex--;
-      const step = this.currentStep;
-      if (step?.type === 'page') {
-        this.pageSubmitted = this.isStepCompleted(this.currentStepIndex) || this.currentPageHasWrongAnswer;
+      const resolved = this.currentResolvedStep;
+      if (resolved?.type === 'step') {
+        this.pageSubmitted = this.isResolvedStepCompleted(this.currentStepIndex) || this.currentPageHasWrongAnswer;
       } else {
         this.pageSubmitted = false;
       }
@@ -352,9 +381,9 @@ export class WizardComponent implements OnInit, OnDestroy {
   goToStep(index: number): void {
     if (index >= 0 && index < this.totalSteps) {
       this.currentStepIndex = index;
-      const step = this.steps[index];
-      if (step.type === 'page') {
-        this.pageSubmitted = this.isStepCompleted(index);
+      const resolved = this.resolvedSteps[index];
+      if (resolved.type === 'step') {
+        this.pageSubmitted = this.isResolvedStepCompleted(index);
       } else {
         this.pageSubmitted = false;
       }
@@ -364,26 +393,26 @@ export class WizardComponent implements OnInit, OnDestroy {
   isStepAccessible(index: number): boolean {
     if (index === 0) return true;
     for (let i = 0; i < index; i++) {
-      if (!this.isStepCompleted(i)) return false;
+      if (!this.isResolvedStepCompleted(i)) return false;
     }
     return true;
   }
 
-  isStepCompleted(index: number): boolean {
-    const step = this.steps[index];
-    if (!step) return false;
-    if (step.type === 'choice') {
-      return this.isChoiceCompleted(step.choice!);
+  isResolvedStepCompleted(index: number): boolean {
+    const resolved = this.resolvedSteps[index];
+    if (!resolved) return false;
+    if (resolved.type === 'choice') {
+      return this.isChoiceCompleted(resolved.choice!);
     }
-    const page = step.page!;
-    return page.questions.every(q => this.answeredQuestions.has(q.id) && this.isCorrect(q));
+    const step = resolved.step!;
+    return step.questions.every(q => this.answeredQuestions.has(q.id) && this.isCorrect(q));
   }
 
   getStepLabel(index: number): string {
-    const step = this.steps[index];
-    if (!step) return '';
-    if (step.type === 'choice') return step.choice!.label;
-    return step.page!.title;
+    const resolved = this.resolvedSteps[index];
+    if (!resolved) return '';
+    if (resolved.type === 'choice') return resolved.choice!.label;
+    return resolved.step!.title;
   }
 
   get currentPageHasWrongAnswer(): boolean {
@@ -392,16 +421,17 @@ export class WizardComponent implements OnInit, OnDestroy {
   }
 
   resetCurrentPage(): void {
-    const page = this.currentPage;
-    if (!page) return;
+    const step = this.currentStep;
+    if (!step) return;
     this.pageSubmitted = false;
-    for (const q of page.questions) {
+    this.submitting = false;
+    this.answerResultsByStep.delete(step.id);
+    for (const q of step.questions) {
       this.selectedAnswers.set(q.id, null);
       this.answeredQuestions.delete(q.id);
     }
-    this.pageStates.set(page.id, { answers: new Map(), completed: false });
-    // Reshuffle questions for the next attempt
-    this.shuffledQuestions.set(page.id, this.shuffleArray([...page.questions]));
+    this.pageStates.set(step.id, { answers: new Map(), completed: false });
+    this.shuffledQuestions.set(step.id, this.shuffleWithOptions([...step.questions]));
   }
 
   // --- Font size control ---
@@ -422,12 +452,12 @@ export class WizardComponent implements OnInit, OnDestroy {
 
   // --- Info section handling ---
 
-  isInfoExpanded(pageId: string): boolean {
-    return this.infoExpandedState.get(pageId) ?? true;
+  isInfoExpanded(stepId: string): boolean {
+    return this.infoExpandedState.get(stepId) ?? true;
   }
 
-  toggleInfoExpanded(pageId: string): void {
-    const current = this.infoExpandedState.get(pageId) ?? true;
-    this.infoExpandedState.set(pageId, !current);
+  toggleInfoExpanded(stepId: string): void {
+    const current = this.infoExpandedState.get(stepId) ?? true;
+    this.infoExpandedState.set(stepId, !current);
   }
 }

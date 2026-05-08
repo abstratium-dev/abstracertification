@@ -1,0 +1,30 @@
+<div class="certification-list-container">
+  <div class="certification-list-header">
+    <h1>Certifications</h1>
+    <p class="description">Choose a certification to begin your learning journey.</p>
+  </div>
+
+  <div class="certifications-grid" *ngIf="!loading() && !error() && certifications().length > 0">
+    <div *ngFor="let cert of certifications()" class="certification-card" (click)="startCertification(cert.id)">
+      <div class="certification-icon">&#127942;</div>
+      <h2 class="certification-title">{{ cert.title }}</h2>
+      <p class="certification-description">{{ cert.description }}</p>
+      <div class="certification-meta">
+        <button class="btn-primary btn-start">Start</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading() && !error() && certifications().length === 0">
+    <p>No certifications available.</p>
+  </div>
+
+  <div class="loading" *ngIf="loading()">
+    <p>Loading certifications...</p>
+  </div>
+
+  <div class="error-message" *ngIf="error()">
+    <h2>Error</h2>
+    <p>{{ error() }}</p>
+  </div>
+</div>

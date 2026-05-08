@@ -65,6 +65,7 @@ CREATE DATABASE abstracertification CHARACTER SET utf8mb4 COLLATE utf8mb4_unicod
 GRANT ALL PRIVILEGES ON abstracertification.* TO abstracertification@'%'; -- on own database
 
 FLUSH PRIVILEGES;
+USE abstracertification;
 ```
 
 exit, then reconnect using the new user:
