@@ -29,6 +29,10 @@ export class CertificationListComponent implements OnInit {
   }
 
   startCertification(certificationId: string): void {
-    this.router.navigate(['/certification', certificationId]);
+    this.router.navigate(['/certification', certificationId, 'page', 1]);
+  }
+
+  viewOverview(certificationId: string): void {
+    this.router.navigate(['/certification', certificationId, 'overview']);
   }
 }

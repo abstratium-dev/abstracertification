@@ -27,6 +27,13 @@ export class CertificationModelService {
   private currentCertificationLoading = signal<boolean>(false);
   private currentCertificationError = signal<string | null>(null);
 
+  /**
+   * Tracks the furthest entry index the user has reached (0-based).
+   * This tracks position in the original entries array, not resolved steps.
+   * Used to prevent URL-based page skipping.
+   */
+  private maxReachedEntryIndex = signal<number>(0);
+
   certifications$: Signal<CertificationSummary[]> = this.certifications.asReadonly();
   certificationsLoading$: Signal<boolean> = this.certificationsLoading.asReadonly();
   certificationsError$: Signal<string | null> = this.certificationsError.asReadonly();
@@ -34,6 +41,8 @@ export class CertificationModelService {
   currentCertification$: Signal<WizardDefinition | null> = this.currentCertification.asReadonly();
   currentCertificationLoading$: Signal<boolean> = this.currentCertificationLoading.asReadonly();
   currentCertificationError$: Signal<string | null> = this.currentCertificationError.asReadonly();
+
+  maxReachedEntryIndex$: Signal<number> = this.maxReachedEntryIndex.asReadonly();
 
   setCertifications(certifications: CertificationSummary[]) {
     this.certifications.set(certifications);
@@ -57,5 +66,13 @@ export class CertificationModelService {
 
   setCurrentCertificationError(error: string | null) {
     this.currentCertificationError.set(error);
+  }
+
+  setMaxReachedEntryIndex(index: number) {
+    this.maxReachedEntryIndex.set(index);
+  }
+
+  resetMaxReachedEntryIndex() {
+    this.maxReachedEntryIndex.set(0);
   }
 }

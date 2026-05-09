@@ -6,7 +6,7 @@ CREATE TABLE T_info_item (
     description TEXT NOT NULL,
     sequence_order INT NOT NULL,
     CONSTRAINT PK_info_item PRIMARY KEY (id),
-    CONSTRAINT FK_info_item_step FOREIGN KEY (step_id) REFERENCES T_certification_step(id)
+    CONSTRAINT FK_info_item_step FOREIGN KEY (step_id) REFERENCES T_certification_step(id) ON DELETE CASCADE
 );
 
 CREATE INDEX I_info_item_step_seq ON T_info_item(step_id, sequence_order);

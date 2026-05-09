@@ -104,10 +104,10 @@ The `T_choice_variant` table defines selectable options within a choice-type pag
 
 ### T_certification_step
 
-The `T_certification_step` table stores individual learning steps — units of instruction with optional assessment questions. Steps can be shared across certifications.
+The `T_certification_step` table stores individual learning steps — units of instruction with optional assessment questions. Each step belongs exclusively to one certification.
 
 **Key Features:**
-- Steps are reusable across multiple certifications via page entry references
+- Steps are exclusively owned by a single certification via `certification_id`
 - The `why` field provides educational context before instructions
 - `info_expanded` controls default visibility of the info section
 

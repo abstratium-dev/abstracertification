@@ -32,8 +32,17 @@ export interface ResolvedWizardStep {
 export class WizardComponent implements OnChanges {
   @Input() definition: WizardDefinition | null = null;
 
+  /** Initial step index to start on (0-based). Used when restoring from URL. */
+  @Input() initialStepIndex = 0;
+
   /** Emits when the user clicks "Submit Answers" — payload is questionId -> selected option ID. */
   @Output() submitAnswers = new EventEmitter<Map<string, string>>();
+
+  /** Emits when the user clicks the "Overview" button to view certification structure. */
+  @Output() viewOverview = new EventEmitter<void>();
+
+  /** Emits when the user navigates to a different step (payload is 0-based step index). */
+  @Output() stepChange = new EventEmitter<number>();
 
   resolvedSteps: ResolvedWizardStep[] = [];
   currentStepIndex = 0;
@@ -72,7 +81,10 @@ export class WizardComponent implements OnChanges {
     this.pageStates.clear();
     this.selectedAnswers.clear();
     this.answeredQuestions.clear();
-    this.currentStepIndex = 0;
+    // Use initialStepIndex if valid, otherwise start at 0
+    const targetStep = Math.max(0, Math.min(this.initialStepIndex, this.definition.entries.length - 1));
+    console.log('[WIZARD] buildSteps, initialStepIndex:', this.initialStepIndex, 'setting currentStepIndex to:', targetStep);
+    this.currentStepIndex = targetStep;
     this.pageSubmitted = false;
     this.submitting = false;
     this.answerResultsByStep.clear();
@@ -147,9 +159,21 @@ export class WizardComponent implements OnChanges {
     return this.resolvedSteps.length;
   }
 
+  /** Returns the number of original entries (for progress display). Does not change when choices add variant steps. */
+  get totalEntries(): number {
+    return this.definition?.entries.length ?? 0;
+  }
+
+  /** Returns the entry index for progress display (1-based). */
+  get currentEntryNumber(): number {
+    return this.getCurrentEntryIndex() + 1;
+  }
+
   get progressPercent(): number {
-    if (this.totalSteps === 0) return 0;
-    return Math.round(((this.currentStepIndex + 1) / this.totalSteps) * 100);
+    const total = this.totalEntries;
+    if (total === 0) return 0;
+    // Use entry index for progress, not resolved step index
+    return Math.round((this.currentEntryNumber / total) * 100);
   }
 
   get currentStepCompleted(): boolean {
@@ -358,14 +382,18 @@ export class WizardComponent implements OnChanges {
   // --- Navigation ---
 
   goNext(): void {
+    console.log('[WIZARD] goNext called, currentStep:', this.currentStepIndex, 'canGoNext:', this.canGoNext);
     if (this.canGoNext) {
       this.currentStepIndex++;
       this.pageSubmitted = false;
+      // Emit the entry index, not the resolved step index
+      this.stepChange.emit(this.getCurrentEntryIndex());
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   goPrev(): void {
+    console.log('[WIZARD] goPrev called, currentStep:', this.currentStepIndex, 'canGoPrev:', this.canGoPrev);
     if (this.canGoPrev) {
       this.currentStepIndex--;
       const resolved = this.currentResolvedStep;
@@ -374,12 +402,15 @@ export class WizardComponent implements OnChanges {
       } else {
         this.pageSubmitted = false;
       }
+      // Emit the entry index, not the resolved step index
+      this.stepChange.emit(this.getCurrentEntryIndex());
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   goToStep(index: number): void {
-    if (index >= 0 && index < this.totalSteps) {
+    console.log('[WIZARD] goToStep called:', index, 'currentStep:', this.currentStepIndex);
+    if (index >= 0 && index < this.totalSteps && index !== this.currentStepIndex) {
       this.currentStepIndex = index;
       const resolved = this.resolvedSteps[index];
       if (resolved.type === 'step') {
@@ -387,7 +418,58 @@ export class WizardComponent implements OnChanges {
       } else {
         this.pageSubmitted = false;
       }
+      // Emit the entry index, not the resolved step index
+      this.stepChange.emit(this.getCurrentEntryIndex());
     }
+  }
+
+  /**
+   * Maps current resolved step index back to the entry index in the original definition.
+   * This handles the case where variant steps have been inserted after choices.
+   */
+  private getCurrentEntryIndex(): number {
+    if (!this.definition) return 0;
+    
+    let entryIndex = 0;
+    let resolvedIndex = 0;
+    
+    while (entryIndex < this.definition.entries.length && resolvedIndex <= this.currentStepIndex) {
+      const entry = this.definition.entries[entryIndex];
+      
+      if (typeof entry === 'string') {
+        // Direct step - consumes one resolved step
+        if (resolvedIndex === this.currentStepIndex) {
+          return entryIndex;
+        }
+        resolvedIndex++;
+      } else {
+        // Choice point
+        const choice = entry as WizardChoicePoint;
+        
+        // Check if we're at the choice step itself
+        if (resolvedIndex === this.currentStepIndex && this.resolvedSteps[resolvedIndex]?.type === 'choice') {
+          return entryIndex;
+        }
+        resolvedIndex++;
+        
+        // Check if we're on a variant step inserted after this choice
+        const variantSteps = this.definition.choiceSteps.get(choice.label) || [];
+        const selectedVariants = this.choiceSelections.get(choice.label) || new Set();
+        
+        for (let i = 0; i < variantSteps.length; i++) {
+          if (selectedVariants.has(i) && resolvedIndex <= this.currentStepIndex) {
+            if (resolvedIndex === this.currentStepIndex) {
+              // We're on a variant step - return the choice's entry index
+              return entryIndex;
+            }
+            resolvedIndex++;
+          }
+        }
+      }
+      entryIndex++;
+    }
+    
+    return Math.min(entryIndex, this.definition.entries.length - 1);
   }
 
   isStepAccessible(index: number): boolean {

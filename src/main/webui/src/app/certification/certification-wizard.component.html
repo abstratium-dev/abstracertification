@@ -1,6 +1,11 @@
-<wizard *ngIf="!loading() && !error() && definition()"
-  [definition]="definition()"
-  (submitAnswers)="onSubmitAnswers($event)"></wizard>
+<div class="wizard-container" *ngIf="!loading() && !error() && definition()">
+  <wizard
+    [definition]="definition()"
+    [initialStepIndex]="initialStepIndex"
+    (submitAnswers)="onSubmitAnswers($event)"
+    (viewOverview)="navigateToOverview()"
+    (stepChange)="onStepChange($event)"></wizard>
+</div>
 
 <div *ngIf="loading()" class="loading">
   <p>Loading certification...</p>

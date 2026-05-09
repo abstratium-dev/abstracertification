@@ -4,23 +4,26 @@
     <h1>{{ definition.title }}</h1>
     <p class="description">{{ definition.description }}</p>
 
-    <!-- Font size controls -->
-    <div class="font-size-controls">
-      <button
-        class="font-size-btn"
-        [class.active]="fontSize === 'small'"
-        (click)="setFontSize('small')"
-        title="Small text">A</button>
-      <button
-        class="font-size-btn"
-        [class.active]="fontSize === 'medium'"
-        (click)="setFontSize('medium')"
-        title="Medium text">A</button>
-      <button
-        class="font-size-btn"
-        [class.active]="fontSize === 'large'"
-        (click)="setFontSize('large')"
-        title="Large text">A</button>
+    <!-- Header actions: Overview button and Font size controls -->
+    <div class="header-actions">
+      <button class="btn-secondary btn-overview" (click)="viewOverview.emit()">&#128196; Overview</button>
+      <div class="font-size-controls">
+        <button
+          class="font-size-btn"
+          [class.active]="fontSize === 'small'"
+          (click)="setFontSize('small')"
+          title="Small text">A</button>
+        <button
+          class="font-size-btn"
+          [class.active]="fontSize === 'medium'"
+          (click)="setFontSize('medium')"
+          title="Medium text">A</button>
+        <button
+          class="font-size-btn"
+          [class.active]="fontSize === 'large'"
+          (click)="setFontSize('large')"
+          title="Large text">A</button>
+      </div>
     </div>
   </div>
 
@@ -29,7 +32,7 @@
     <div class="progress-bar">
       <div class="progress-fill" [style.width.%]="progressPercent"></div>
     </div>
-    <span class="progress-text">Step {{ currentStepIndex + 1 }} of {{ totalSteps }}</span>
+    <span class="progress-text">Step {{ currentEntryNumber }} of {{ totalEntries }}</span>
   </div>
 
   <!-- Step navigation dots -->

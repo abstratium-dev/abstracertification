@@ -1,0 +1,91 @@
+<div class="overview-container" *ngIf="!loading() && !error() && definition()">
+  <div class="overview-header">
+    <button class="btn-back" (click)="goBack()">&larr; Back</button>
+    <h1>{{ definition()!.title }}</h1>
+    <p class="description">{{ definition()!.description }}</p>
+  </div>
+
+  <div class="overview-content">
+    <h2>Certification Structure</h2>
+    <p class="overview-summary">
+      This certification contains {{ definition()!.steps.length }} direct step(s)
+      and {{ definition()!.entries.filter(isChoicePoint).length }} choice point(s).
+    </p>
+
+    <div class="entries-list">
+      <div *ngFor="let entry of definition()!.entries; let i = index" class="entry-item">
+        <!-- Direct Step Entry -->
+        <div *ngIf="!isChoicePoint(entry)" class="entry-direct">
+          <div class="entry-header">
+            <span class="entry-number">{{ i + 1 }}</span>
+          </div>
+          <div class="entry-content">
+            <h3 class="step-title">{{ getStepByRef(entry, definition()!)?.title }}</h3>
+            <p class="step-why">{{ getStepByRef(entry, definition()!)?.why }}</p>
+            <div class="step-meta" *ngIf="getStepByRef(entry, definition()!) as step">
+              <span class="meta-item">
+                {{ step.infoItems.length || 0 }} key concept(s)
+              </span>
+              <span class="meta-item">
+                {{ step.instructions.length || 0 }} instruction(s)
+              </span>
+              <span class="meta-item">
+                {{ step.questions.length || 0 }} question(s)
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Choice Point Entry -->
+        <div *ngIf="isChoicePoint(entry)" class="entry-choice">
+          <div class="entry-header">
+            <span class="entry-number">{{ i + 1 }}</span>
+            <span class="entry-type-badge choice">CHOICE</span>
+          </div>
+          <div class="entry-content">
+            <h3 class="choice-label">{{ entry.label }}</h3>
+            <p class="choice-description">{{ entry.description }}</p>
+            <p class="choice-requirements">
+              Select {{ entry.minRequired }}
+              <span *ngIf="entry.maxRequired !== entry.minRequired"> to {{ entry.maxRequired }}</span>
+              option(s)
+            </p>
+
+            <div class="choice-variants">
+              <div *ngFor="let variantStep of getChoiceSteps(entry, definition()!)" class="variant-item">
+                <div class="variant-header">
+                  <span class="variant-label">{{ variantStep.variant.label }}</span>
+                </div>
+                <p class="variant-description">{{ variantStep.variant.description }}</p>
+                <div *ngIf="variantStep.step" class="variant-step-details">
+                  <h4 class="step-title">{{ variantStep.step.title }}</h4>
+                  <div class="step-meta">
+                    <span class="meta-item">
+                      {{ variantStep.step.infoItems.length }} key concept(s)
+                    </span>
+                    <span class="meta-item">
+                      {{ variantStep.step.instructions.length }} instruction(s)
+                    </span>
+                    <span class="meta-item">
+                      {{ variantStep.step.questions.length }} question(s)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading()" class="loading">
+  <p>Loading certification overview...</p>
+</div>
+
+<div *ngIf="error()" class="error-message">
+  <h2>Error</h2>
+  <p>{{ error() }}</p>
+  <button class="btn-primary" (click)="navigateToCertifications()">Back to Certifications</button>
+</div>

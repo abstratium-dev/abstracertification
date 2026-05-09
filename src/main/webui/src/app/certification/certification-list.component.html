@@ -5,12 +5,13 @@
   </div>
 
   <div class="certifications-grid" *ngIf="!loading() && !error() && certifications().length > 0">
-    <div *ngFor="let cert of certifications()" class="certification-card" (click)="startCertification(cert.id)">
+    <div *ngFor="let cert of certifications()" class="certification-card">
       <div class="certification-icon">&#127942;</div>
       <h2 class="certification-title">{{ cert.title }}</h2>
       <p class="certification-description">{{ cert.description }}</p>
       <div class="certification-meta">
-        <button class="btn-primary btn-start">Start</button>
+        <button class="btn-secondary btn-overview" (click)="viewOverview(cert.id); $event.stopPropagation()">Overview</button>
+        <button class="btn-primary btn-start" (click)="startCertification(cert.id)">Start</button>
       </div>
     </div>
   </div>

@@ -9,7 +9,7 @@ CREATE TABLE T_certification_step (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT PK_certification_step PRIMARY KEY (id),
-    CONSTRAINT FK_step_certification FOREIGN KEY (certification_id) REFERENCES T_certification(id),
+    CONSTRAINT FK_step_certification FOREIGN KEY (certification_id) REFERENCES T_certification(id) ON DELETE CASCADE,
     CONSTRAINT I_step_cert_key UNIQUE (certification_id, step_key)
 );
 

@@ -6,7 +6,7 @@ CREATE TABLE T_question (
     text TEXT NOT NULL,
     sequence_order INT NOT NULL,
     CONSTRAINT PK_question PRIMARY KEY (id),
-    CONSTRAINT FK_question_step FOREIGN KEY (step_id) REFERENCES T_certification_step(id),
+    CONSTRAINT FK_question_step FOREIGN KEY (step_id) REFERENCES T_certification_step(id) ON DELETE CASCADE,
     CONSTRAINT I_question_step_key UNIQUE (step_id, question_key)
 );
 
