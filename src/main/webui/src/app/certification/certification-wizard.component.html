@@ -3,9 +3,11 @@
     [definition]="definition()"
     [initialStepIndex]="initialStepIndex"
     [maxReachedEntryIndex]="maxReachedEntryIndex()"
+    [initialChoiceSelections]="choiceSelections()"
     (submitAnswers)="onSubmitAnswers($event)"
     (viewOverview)="navigateToOverview()"
-    (stepChange)="onStepChange($event)"></wizard>
+    (stepChange)="onStepChange($event)"
+    (choiceSelectionsChange)="onChoiceSelectionsChange($event)"></wizard>
 </div>
 
 <div *ngIf="loading()" class="loading">

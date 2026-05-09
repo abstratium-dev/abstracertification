@@ -24,6 +24,7 @@ export class CertificationWizardComponent implements OnInit, OnDestroy {
   loading = this.modelService.currentCertificationLoading$;
   error = this.modelService.currentCertificationError$;
   maxReachedEntryIndex = this.modelService.maxReachedEntryIndex$;
+  choiceSelections = this.modelService.choiceSelections$;
 
   /** Current step index derived from URL page parameter (0-based). */
   initialStepIndex = 0;
@@ -64,7 +65,10 @@ export class CertificationWizardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Validates the requested page number and redirects if user tries to skip ahead.
+   * Validates the requested page number and redirects if:
+   * 1. User tries to skip ahead of their progress
+   * 2. User is behind their saved progress (on page refresh, navigate to latest)
+   *
    * Page numbers in URL are 1-based, internal step indices are 0-based.
    */
   private validateAndNavigateToPage(pageParam: string | null): void {
@@ -74,17 +78,29 @@ export class CertificationWizardComponent implements OnInit, OnDestroy {
 
     const requestedPage = pageParam ? parseInt(pageParam, 10) : 1;
     const totalEntries = def.entries.length;
-    console.log('[DEBUG] validation state:', { requestedPage, totalEntries });
+    const maxReachedEntryIndex = this.modelService.maxReachedEntryIndex$();
+
+    // The "latest page" is the furthest page the user can access
+    // (maxReached + 1, or maxReached if at the end)
+    const latestPage = Math.min(maxReachedEntryIndex + 1, totalEntries);
+
+    console.log('[DEBUG] validation state:', { pageParam, requestedPage, totalEntries, maxReachedEntryIndex, latestPage });
+
+    // When entering certification without a page parameter, redirect to latest saved page
+    if (!pageParam && maxReachedEntryIndex > 0) {
+      console.log('[DEBUG] entering cert without page, redirecting to latest:', latestPage);
+      this.router.navigate(['/certification', this.certificationId, 'page', latestPage], { replaceUrl: true });
+      return;
+    }
 
     // Validate page number is within bounds
     if (isNaN(requestedPage) || requestedPage < 1 || requestedPage > totalEntries) {
-      console.log('[DEBUG] page out of bounds, redirecting to 1');
-      this.router.navigate(['/certification', this.certificationId, 'page', 1], { replaceUrl: true });
+      console.log('[DEBUG] page out of bounds, redirecting to latest:', latestPage);
+      this.router.navigate(['/certification', this.certificationId, 'page', latestPage], { replaceUrl: true });
       return;
     }
 
     const requestedEntryIndex = requestedPage - 1;
-    const maxReachedEntryIndex = this.modelService.maxReachedEntryIndex$();
 
     // User can access entries they've been to (maxReached)
     // AND the next entry they need to work on (maxReached + 1)
@@ -95,6 +111,14 @@ export class CertificationWizardComponent implements OnInit, OnDestroy {
       const allowedPage = Math.min(maxAllowedEntry + 1, totalEntries);
       console.log('[DEBUG] entry not allowed, redirecting to:', allowedPage);
       this.router.navigate(['/certification', this.certificationId, 'page', allowedPage], { replaceUrl: true });
+      return;
+    }
+
+    // On refresh (initial load), if user is behind their saved progress,
+    // redirect them to the latest page they can access
+    if (requestedPage < latestPage && maxReachedEntryIndex > 0) {
+      console.log('[DEBUG] page behind saved progress, redirecting to latest:', latestPage);
+      this.router.navigate(['/certification', this.certificationId, 'page', latestPage], { replaceUrl: true });
       return;
     }
 
@@ -140,5 +164,16 @@ export class CertificationWizardComponent implements OnInit, OnDestroy {
     // Update URL to reflect current entry (use replaceUrl to avoid polluting history)
     console.log('[DEBUG] navigating to URL page:', currentPage);
     this.router.navigate(['/certification', this.certificationId, 'page', currentPage], { replaceUrl: true });
+  }
+
+  /**
+   * Handles choice selection changes from the wizard.
+   * Updates the model to persist selections to localStorage.
+   */
+  onChoiceSelectionsChange(selections: Map<string, Set<number>>): void {
+    console.log('[DEBUG] choiceSelectionsChange:', selections);
+    for (const [label, selectedIndices] of selections.entries()) {
+      this.modelService.setChoiceSelections(label, selectedIndices);
+    }
   }
 }

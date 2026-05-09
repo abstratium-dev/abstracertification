@@ -47,6 +47,12 @@ export class WizardComponent implements OnChanges {
   /** Emits when the user navigates to a different step (payload is 0-based step index). */
   @Output() stepChange = new EventEmitter<number>();
 
+  /** Initial choice selections to restore after page refresh: choiceLabel -> Set of variant indices. */
+  @Input() initialChoiceSelections: Map<string, Set<number>> = new Map();
+
+  /** Emits when choice selections change (payload is choiceLabel -> Set of variant indices). */
+  @Output() choiceSelectionsChange = new EventEmitter<Map<string, Set<number>>>();
+
   resolvedSteps: ResolvedWizardStep[] = [];
   currentStepIndex = 0;
   pageStates: Map<string, WizardPageState> = new Map();
@@ -84,10 +90,6 @@ export class WizardComponent implements OnChanges {
     this.pageStates.clear();
     this.selectedAnswers.clear();
     this.answeredQuestions.clear();
-    // Use initialStepIndex if valid, otherwise start at 0
-    const targetStep = Math.max(0, Math.min(this.initialStepIndex, this.definition.entries.length - 1));
-    console.log('[WIZARD] buildSteps, initialStepIndex:', this.initialStepIndex, 'setting currentStepIndex to:', targetStep);
-    this.currentStepIndex = targetStep;
     this.pageSubmitted = false;
     this.submitting = false;
     this.answerResultsByStep.clear();
@@ -101,7 +103,42 @@ export class WizardComponent implements OnChanges {
       } else {
         const choice = entry as WizardChoicePoint;
         this.resolvedSteps.push({ type: 'choice', choice });
-        this.choiceSelections.set(choice.label, new Set());
+        // Restore choice selections from localStorage if available
+        const restoredSelections = this.initialChoiceSelections.get(choice.label);
+        this.choiceSelections.set(choice.label, restoredSelections ? new Set(restoredSelections) : new Set());
+      }
+    }
+
+    // Restore variant steps from choice selections after all base steps are built
+    this.restoreVariantSteps();
+
+    // Calculate the correct resolved step index from initialStepIndex (entry index)
+    // This must be done AFTER variants are restored so the mapping is correct
+    const targetEntryIndex = Math.max(0, Math.min(this.initialStepIndex, this.definition.entries.length - 1));
+    const targetResolvedIndex = this.getResolvedIndexForEntry(targetEntryIndex);
+    // Ensure the resolved index is within bounds (it should be, but be safe)
+    this.currentStepIndex = Math.min(targetResolvedIndex, this.resolvedSteps.length - 1);
+    console.log('[WIZARD] buildSteps, initialStepIndex (entry):', this.initialStepIndex, '-> resolvedStepIndex:', this.currentStepIndex);
+  }
+
+  /**
+   * Restores variant steps based on the restored choice selections.
+   * This must be called after buildSteps has built the base steps.
+   */
+  private restoreVariantSteps(): void {
+    if (!this.definition) return;
+
+    for (const entry of this.definition.entries) {
+      if (typeof entry !== 'string') {
+        const choice = entry as WizardChoicePoint;
+        const selected = this.choiceSelections.get(choice.label);
+        if (selected && selected.size > 0) {
+          // Insert variant steps in order
+          const sortedVariants = Array.from(selected).sort((a, b) => a - b);
+          for (const variantIndex of sortedVariants) {
+            this.insertVariantStep(choice.label, variantIndex);
+          }
+        }
       }
     }
   }
@@ -241,6 +278,8 @@ export class WizardComponent implements OnChanges {
       selected.add(variantIndex);
       this.insertVariantStep(choiceLabel, variantIndex);
     }
+    // Emit updated selections for persistence
+    this.choiceSelectionsChange.emit(new Map(this.choiceSelections));
   }
 
   isVariantSelected(choiceLabel: string, variantIndex: number): boolean {

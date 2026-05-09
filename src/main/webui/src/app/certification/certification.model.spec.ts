@@ -140,4 +140,134 @@ describe('CertificationModelService', () => {
       expect(service2.certifications$()).toEqual([{ id: '1', title: 'A', description: '' }]);
     });
   });
+
+  describe('Progress Persistence', () => {
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('should have initial maxReachedEntryIndex of 0', () => {
+      expect(service.maxReachedEntryIndex$()).toBe(0);
+    });
+
+    it('should have empty choiceSelections initially', () => {
+      expect(service.choiceSelections$()).toEqual(new Map());
+    });
+
+    it('should update maxReachedEntryIndex', () => {
+      service.setMaxReachedEntryIndex(5);
+      expect(service.maxReachedEntryIndex$()).toBe(5);
+    });
+
+    it('should persist maxReachedEntryIndex to localStorage', () => {
+      const definition: WizardDefinition = {
+        id: 'test-cert', title: 'Test', description: 'Desc',
+        entries: [], steps: [], choiceSteps: new Map()
+      };
+
+      service.setCurrentCertification(definition, 'test-cert');
+      service.setMaxReachedEntryIndex(3);
+
+      const stored = localStorage.getItem('wizard-progress-test-cert');
+      expect(stored).toBeTruthy();
+      expect(JSON.parse(stored!).maxReachedEntryIndex).toBe(3);
+    });
+
+    it('should persist choiceSelections to localStorage', () => {
+      const definition: WizardDefinition = {
+        id: 'test-cert', title: 'Test', description: 'Desc',
+        entries: [], steps: [], choiceSteps: new Map()
+      };
+
+      service.setCurrentCertification(definition, 'test-cert');
+      service.setChoiceSelections('Choose setup', new Set([0, 2]));
+
+      const stored = localStorage.getItem('wizard-progress-test-cert');
+      expect(stored).toBeTruthy();
+      const parsed = JSON.parse(stored!);
+      expect(parsed.choiceSelections).toEqual({ 'Choose setup': [0, 2] });
+    });
+
+    it('should load progress from localStorage when setting certification', () => {
+      localStorage.setItem('wizard-progress-existing-cert', JSON.stringify({
+        maxReachedEntryIndex: 7,
+        choiceSelections: { 'Setup': [1] }
+      }));
+
+      const definition: WizardDefinition = {
+        id: 'existing-cert', title: 'Test', description: 'Desc',
+        entries: [], steps: [], choiceSteps: new Map()
+      };
+
+      service.setCurrentCertification(definition, 'existing-cert');
+
+      expect(service.maxReachedEntryIndex$()).toBe(7);
+      expect(service.choiceSelections$().get('Setup')).toEqual(new Set([1]));
+    });
+
+    it('should reset progress when resetMaxReachedEntryIndex is called', () => {
+      localStorage.setItem('wizard-progress-reset-cert', JSON.stringify({
+        maxReachedEntryIndex: 5,
+        choiceSelections: { 'Choice': [0] }
+      }));
+
+      const definition: WizardDefinition = {
+        id: 'reset-cert', title: 'Test', description: 'Desc',
+        entries: [], steps: [], choiceSteps: new Map()
+      };
+
+      service.setCurrentCertification(definition, 'reset-cert');
+      expect(service.maxReachedEntryIndex$()).toBe(5);
+
+      service.resetMaxReachedEntryIndex();
+
+      expect(service.maxReachedEntryIndex$()).toBe(0);
+      expect(service.choiceSelections$()).toEqual(new Map());
+      expect(localStorage.getItem('wizard-progress-reset-cert')).toBeNull();
+    });
+
+    it('should update choiceSelections with setChoiceSelections', () => {
+      service.setChoiceSelections('Test Choice', new Set([0, 1]));
+
+      expect(service.choiceSelections$().get('Test Choice')).toEqual(new Set([0, 1]));
+    });
+
+    it('should merge choice selections for different labels', () => {
+      service.setChoiceSelections('Choice A', new Set([0]));
+      service.setChoiceSelections('Choice B', new Set([1, 2]));
+
+      const selections = service.choiceSelections$();
+      expect(selections.get('Choice A')).toEqual(new Set([0]));
+      expect(selections.get('Choice B')).toEqual(new Set([1, 2]));
+    });
+
+    it('should isolate progress per certification', () => {
+      const def1: WizardDefinition = {
+        id: 'cert-1', title: 'Cert 1', description: 'Desc',
+        entries: [], steps: [], choiceSteps: new Map()
+      };
+      const def2: WizardDefinition = {
+        id: 'cert-2', title: 'Cert 2', description: 'Desc',
+        entries: [], steps: [], choiceSteps: new Map()
+      };
+
+      service.setCurrentCertification(def1, 'cert-1');
+      service.setMaxReachedEntryIndex(3);
+
+      service.setCurrentCertification(def2, 'cert-2');
+      service.setMaxReachedEntryIndex(7);
+
+      // Reload cert-1
+      service.setCurrentCertification(def1, 'cert-1');
+      expect(service.maxReachedEntryIndex$()).toBe(3);
+
+      // Reload cert-2
+      service.setCurrentCertification(def2, 'cert-2');
+      expect(service.maxReachedEntryIndex$()).toBe(7);
+    });
+  });
 });

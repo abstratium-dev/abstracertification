@@ -5,7 +5,7 @@ VALUES ('4df3650f-6849-4cd7-8eaa-611b06adf437', 'linux-home-server', 'DIRECT', 0
 
 -- Entry 2: Choice for installing Linux
 INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
-VALUES ('0c50d416-1d9d-4987-99ef-77ee562083df', 'linux-home-server', 'CHOICE', 1, NULL, 'Installing Linux', 'Choose how to create your bootable USB drive based on the operating system you are starting from.', 1, 1);
+VALUES ('0c50d416-1d9d-4987-99ef-77ee562083df', 'linux-home-server', 'CHOICE', 1, NULL, 'Installing Linux', 'In order to install Linux, you first need to create a USB drive with the installation image. Choose how to create your bootable USB drive based on the operating system you are starting from.', 1, 1);
 
 -- Choice variants for installing Linux
 INSERT INTO T_choice_variant (id, page_entry_id, label, description, step_id, sequence_order)

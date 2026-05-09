@@ -10,12 +10,21 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 ## Today
 
 - make wizard in core more abstract
+- allow users to submit feedback
+- user needs to add the user to the right groups so that they can upload files to the server (var/www and etc/nginx)
+- remove reference to pageant until we do the hardening certificate
+- make many answers longer so that the right one isn't always the longest one!
+- provide an instruction that allows the user to enter the hostname, not just it's ip address. add that to the ssh client page and refer to it on the nginx page.
 - persistence for when answers are sent, IF the user is signed in
 - fix budgets in angular.json -> 5.5 mb is WAY to big
 - check we randomize the answers, not just the questions
 - add copyright notices to the source files
 - make abstracertification check things that are available online or get the user to paste things that it can verify that the user has actually done the work
+- add links to other certifications on pages and at the end of a certification
+  - show certification paths to becoming an abstratium professional
 - create a markdown document in the docs folder to describe the certification modules that can be added to the webui/public folder which describes the way in which you can configure modules and their pages including all the options that exist. it should act as a specification for future engineers and LLMs.
+- change lines like the following so that they use console.debug
+  - `console.log('[DEBUG] choiceSelectionsChange:', selections);`
 - move wizard which is in core back up to abstracore
 - let user add notes
 - let user supply feedback
@@ -30,7 +39,7 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
     - fail2ban
     - disk encryption using abstravault
     - firewall
-    - ssh hardening
+    - ssh hardening including certificate based authentication
     - nginx rate limiting
     - etc.
   - wireguard vpn (peer to peer but as "client" and "server")

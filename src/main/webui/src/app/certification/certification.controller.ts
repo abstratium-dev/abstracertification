@@ -124,7 +124,7 @@ export class CertificationController {
     this.http.get<BackendCertification>(`${this.publicApiUrl}/${certificationId}`).subscribe({
       next: (cert) => {
         const definition = this.mapToWizardDefinition(cert);
-        this.modelService.setCurrentCertification(definition);
+        this.modelService.setCurrentCertification(definition, certificationId);
         this.modelService.setCurrentCertificationLoading(false);
       },
       error: (err) => {
