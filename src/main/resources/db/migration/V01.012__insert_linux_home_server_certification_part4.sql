@@ -109,6 +109,80 @@ VALUES ('a2658b52-d014-4cf1-9c3d-e32e723ef690', 'c8daeee0-aecd-4061-a075-1bd9e5b
 INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
 VALUES ('a4b39f34-5722-409a-9c2f-f19f3c665462', 'c8daeee0-aecd-4061-a075-1bd9e5b123a7', 'Uninstall OpenSSH and reinstall it', FALSE, 3);
 
+-- Questions and answers for ssh-connect-windows step
+INSERT INTO T_question (id, step_id, question_key, text, sequence_order)
+VALUES ('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'q-ssh-connect-win-1', 'How do you install the OpenSSH client on Windows 10/11?', 0);
+
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'Download it from a third-party website', FALSE, 0);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'Use Add-WindowsCapability in PowerShell or enable it via Windows Settings > Optional Features', TRUE, 1);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'It requires a Windows reinstallation', FALSE, 2);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b', 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', 'Install PuTTY instead, Windows has no built-in SSH', FALSE, 3);
+
+INSERT INTO T_question (id, step_id, question_key, text, sequence_order)
+VALUES ('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'q-ssh-connect-win-2', 'What is the difference between the -p flag in ssh and the -P flag in scp?', 1);
+
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 'There is no difference, they are interchangeable', FALSE, 0);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 'Both use lowercase -p to specify the port', FALSE, 1);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 'ssh uses lowercase -p for port, scp uses uppercase -P for port (because lowercase -p is used for preserving file attributes)', TRUE, 2);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f', 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 'scp does not support custom ports', FALSE, 3);
+
+INSERT INTO T_question (id, step_id, question_key, text, sequence_order)
+VALUES ('c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'q-ssh-connect-win-3', 'What does accepting the server fingerprint on first connection protect against?', 2);
+
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('d0e1f2a3-b4c5-4d6e-7f8a-9b0c1d2e3f4a', 'c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f', 'Viruses on the server', FALSE, 0);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b', 'c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f', 'Man-in-the-middle attacks — it verifies you are connecting to the real server', TRUE, 1);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('f2a3b4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6c', 'c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f', 'Data loss during file transfers', FALSE, 2);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('a3b4c5d6-e7f8-4a9b-0c1d-2e3f4a5b6c7d', 'c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f', 'Unauthorized users accessing your local machine', FALSE, 3);
+
+-- Questions and answers for ssh-connect-linux step
+INSERT INTO T_question (id, step_id, question_key, text, sequence_order)
+VALUES ('d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'q-ssh-connect-linux-1', 'How do you verify if the OpenSSH client is installed on Linux?', 0);
+
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9c', 'd4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a', 'Check the system settings GUI', FALSE, 0);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0d', 'd4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a', 'Run ssh -V to check for the version output', TRUE, 1);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1e', 'd4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a', 'Look for the SSH icon in the application menu', FALSE, 2);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2f', 'd4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a', 'It is always installed by default on every Linux distribution', FALSE, 3);
+
+INSERT INTO T_question (id, step_id, question_key, text, sequence_order)
+VALUES ('e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'q-ssh-connect-linux-2', 'What does the -r flag do when using scp?', 1);
+
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0e', 'e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b', 'It resumes an interrupted transfer', FALSE, 0);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1f', 'e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b', 'It copies directories and their contents recursively', TRUE, 1);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d20', 'e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b', 'It renames the file during transfer', FALSE, 2);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e30', 'e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b', 'It restricts the transfer speed', FALSE, 3);
+
+INSERT INTO T_question (id, step_id, question_key, text, sequence_order)
+VALUES ('f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'q-ssh-connect-linux-3', 'What does accepting the server fingerprint on first connection protect against?', 2);
+
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c2a', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'Viruses on the server', FALSE, 0);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d3a', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'Man-in-the-middle attacks — it verifies you are connecting to the real server', TRUE, 1);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e4a', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'Data loss during file transfers', FALSE, 2);
+INSERT INTO T_answer_option (id, question_id, text, is_correct, sequence_order)
+VALUES ('d0e1f2a3-b4c5-4d6e-7f8a-9b0c1d2e3f5a', 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', 'Unauthorized users accessing your local machine', FALSE, 3);
+
 -- Questions and answers for port-forwarding step
 INSERT INTO T_question (id, step_id, question_key, text, sequence_order)
 VALUES ('c016443e-03a8-4d3d-a926-70ce013a64fe', 'ff7f23e8-1c03-467a-a1da-7abfa901bacf', 'q-port-1', 'Why is port forwarding necessary to access your server from the internet?', 0);

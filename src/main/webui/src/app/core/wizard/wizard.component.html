@@ -38,15 +38,14 @@
   <!-- Step navigation dots -->
   <div class="wizard-nav">
     <button
-      *ngFor="let resolved of resolvedSteps; let i = index"
+      *ngFor="let entry of definition.entries; let i = index"
       class="nav-dot"
-      [class.active]="i === currentStepIndex"
-      [class.completed]="isResolvedStepCompleted(i)"
-      [class.accessible]="isStepAccessible(i)"
-      [class.choice-dot]="resolved.type === 'choice'"
-      [disabled]="!isStepAccessible(i)"
-      (click)="goToStep(i)"
-      [title]="getStepLabel(i)">
+      [class.active]="isEntryActive(i)"
+      [class.completed]="isEntryCompleted(i)"
+      [class.accessible]="isEntryAccessible(i)"
+      [disabled]="!isEntryAccessible(i)"
+      (click)="goToEntry(i)"
+      [title]="getEntryLabel(i)">
       {{ i + 1 }}
     </button>
   </div>

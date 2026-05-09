@@ -14,6 +14,7 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 - fix budgets in angular.json -> 5.5 mb is WAY to big
 - check we randomize the answers, not just the questions
 - add copyright notices to the source files
+- make abstracertification check things that are available online or get the user to paste things that it can verify that the user has actually done the work
 - create a markdown document in the docs folder to describe the certification modules that can be added to the webui/public folder which describes the way in which you can configure modules and their pages including all the options that exist. it should act as a specification for future engineers and LLMs.
 - move wizard which is in core back up to abstracore
 - let user add notes

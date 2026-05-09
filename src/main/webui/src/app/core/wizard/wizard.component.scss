@@ -32,7 +32,7 @@
   font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
   padding: 0; transition: all 0.2s ease;
   &.active { border-color: var(--color-primary); background: var(--color-primary); color: white; }
-  &.completed { border-color: var(--color-success); background: var(--color-success); color: white; }
+  &.completed:not(.active) { border-color: var(--color-success); background: var(--color-success); color: white; }
   &.accessible:not(.active):not(.completed):hover { border-color: var(--color-primary); background: var(--color-bg-hover); }
   &:disabled { opacity: 0.4; cursor: not-allowed; }
 }
@@ -153,7 +153,6 @@
 .variant-label { margin: 0 0 0.25rem 0; font-size: 1.1rem; }
 .variant-description { margin: 0; font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.5; }
 .choice-hint { margin: 0 0 1.5rem 0; font-size: 0.875rem; font-style: italic; color: var(--color-text-secondary); }
-.choice-dot { border-style: dashed !important; }
 
 .mermaid-diagram {
   margin: 1rem 0; padding: 1rem; background: var(--color-bg-primary); border: 1px solid var(--color-border-primary);

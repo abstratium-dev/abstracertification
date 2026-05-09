@@ -1,3 +1,65 @@
+-- Instructions for ssh-connect-windows step
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('f1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'Check if the OpenSSH client is already installed on your Windows machine. Open PowerShell as Administrator and run:', 'Get-WindowsCapability -Online | Where-Object Name -like ''OpenSSH.Client*''', 'If the state shows ''Installed'', you are ready to go. If it shows ''NotPresent'', proceed to the next step to install it.', NULL, 0);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('a2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'If the OpenSSH client is not installed, install it via PowerShell (as Administrator):', 'Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0', 'This installs the built-in OpenSSH client that has been available since Windows 10 version 1809.', NULL, 1);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('b3c4d5e6-f7a8-4b9c-0d1e-2f3a4b5c6d7e', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'Connect to your server via SSH. Open PowerShell or Command Prompt and run:', 'ssh your_user@your_server_ip', 'Replace your_user with the username you created during installation and your_server_ip with the server''s local IP address (e.g. 192.168.1.100). If you changed the SSH port, add -p 2222.', NULL, 2);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('c4d5e6f7-a8b9-4c0d-1e2f-3a4b5c6d7e8f', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'The first time you connect, you will see a message asking to verify the server''s fingerprint. Type ''yes'' to accept and continue. You will then be prompted for your password.', NULL, 'This fingerprint verification protects against man-in-the-middle attacks. The fingerprint is stored in your known_hosts file so you will not be asked again for this server.', NULL, 3);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('d5e6f7a8-b9c0-4d1e-2f3a-4b5c6d7e8f9a', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'If you configured key-based authentication, connect using your key:', 'ssh -i C:\\Users\\YourName\\.ssh\\id_ed25519 your_user@your_server_ip', 'Windows stores SSH keys in C:\\Users\\YourName\\.ssh\\ by default.', NULL, 4);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('e6f7a8b9-c0d1-4e2f-3a4b-5c6d7e8f9a0b', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'SCP (Secure Copy Protocol) allows you to transfer files between your Windows machine and the server. It uses the same SSH connection for secure transfers.', NULL, NULL, NULL, 5);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('f7a8b9c0-d1e2-4f3a-4b5c-6d7e8f9a0b1c', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'Copy a file from your Windows machine to the server:', 'scp C:\\path\\to\\local\\file.txt your_user@your_server_ip:/home/your_user/', 'Replace the paths and credentials with your actual values. If you changed the SSH port, add -P 2222 (note: uppercase P for scp).', NULL, 6);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('a8b9c0d1-e2f3-4a4b-5c6d-7e8f9a0b1c2d', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'Copy a file from the server to your Windows machine:', 'scp your_user@your_server_ip:/home/your_user/file.txt C:\\path\\to\\local\\', NULL, NULL, 7);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('b9c0d1e2-f3a4-4b5c-6d7e-8f9a0b1c2d3e', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'Copy an entire directory recursively from your Windows machine to the server:', 'scp -r C:\\path\\to\\local\\folder your_user@your_server_ip:/home/your_user/', 'The -r flag copies directories and their contents recursively.', NULL, 8);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('c0d1e2f3-a4b5-4c6d-7e8f-9a0b1c2d3e4f', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 'To disconnect from the SSH session, type:', 'exit', NULL, NULL, 9);
+
+-- Instructions for ssh-connect-linux step
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('d1e2f3a4-b5c6-4d7e-8f9a-0b1c2d3e4f5a', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'Check if the OpenSSH client is installed on your Linux machine:', 'ssh -V', 'If the command outputs a version number, you are ready. If it says ''command not found'', proceed to the next step.', NULL, 0);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('e2f3a4b5-c6d7-4e8f-9a0b-1c2d3e4f5a6b', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'If the OpenSSH client is not installed, install it using your package manager:', 'sudo apt install openssh-client -y', 'On Fedora/RHEL use: sudo dnf install openssh-clients. On Arch use: sudo pacman -S openssh.', NULL, 1);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('f3a4b5c6-d7e8-4f9a-0b1c-2d3e4f5a6b7c', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'Connect to your server via SSH:', 'ssh your_user@your_server_ip', 'Replace your_user with the username you created during installation and your_server_ip with the server''s local IP address (e.g. 192.168.1.100). If you changed the SSH port, add -p 2222.', NULL, 2);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('a4b5c6d7-e8f9-4a0b-1c2d-3e4f5a6b7c8d', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'The first time you connect, you will see a message asking to verify the server''s fingerprint. Type ''yes'' to accept and continue. You will then be prompted for your password.', NULL, 'This fingerprint verification protects against man-in-the-middle attacks. The fingerprint is stored in ~/.ssh/known_hosts so you will not be asked again for this server.', NULL, 3);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('b5c6d7e8-f9a0-4b1c-2d3e-4f5a6b7c8d9e', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'If you configured key-based authentication, connect using your key:', 'ssh -i ~/.ssh/id_ed25519 your_user@your_server_ip', 'If you used the default key location and name, SSH will find it automatically and you can simply use ssh your_user@your_server_ip.', NULL, 4);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('c6d7e8f9-a0b1-4c2d-3e4f-5a6b7c8d9e0f', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'SCP (Secure Copy Protocol) allows you to transfer files between your Linux machine and the server. It uses the same SSH connection for secure transfers.', NULL, NULL, NULL, 5);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('d7e8f9a0-b1c2-4d3e-4f5a-6b7c8d9e0f1a', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'Copy a file from your local machine to the server:', 'scp /path/to/local/file.txt your_user@your_server_ip:/home/your_user/', 'Replace the paths and credentials with your actual values. If you changed the SSH port, add -P 2222 (note: uppercase P for scp).', NULL, 6);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('e8f9a0b1-c2d3-4e4f-5a6b-7c8d9e0f1a2b', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'Copy a file from the server to your local machine:', 'scp your_user@your_server_ip:/home/your_user/file.txt /path/to/local/', NULL, NULL, 7);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('f9a0b1c2-d3e4-4f5a-6b7c-8d9e0f1a2b3c', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'Copy an entire directory recursively from your local machine to the server:', 'scp -r /path/to/local/folder your_user@your_server_ip:/home/your_user/', 'The -r flag copies directories and their contents recursively.', NULL, 8);
+
+INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
+VALUES ('a0b1c2d3-e4f5-4a6b-7c8d-9e0f1a2b3c4d', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 'To disconnect from the SSH session, type:', 'exit', NULL, NULL, 9);
+
 -- Continue: Instructions for nginx step
 INSERT INTO T_instruction (id, step_id, text, command, note, mermaid_diagram, sequence_order)
 VALUES ('08a150b8-02f7-4130-9f3b-8733993a6a9a', '4b4023e4-e123-42fe-8fb9-154cb11d2833', 'Install Nginx from the Ubuntu package repository.', 'sudo apt install nginx -y', NULL, NULL, 0);

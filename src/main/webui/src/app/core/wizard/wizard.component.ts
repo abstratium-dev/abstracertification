@@ -35,6 +35,9 @@ export class WizardComponent implements OnChanges {
   /** Initial step index to start on (0-based). Used when restoring from URL. */
   @Input() initialStepIndex = 0;
 
+  /** Highest entry index the user has previously reached. Used to render past entries as completed. */
+  @Input() maxReachedEntryIndex = 0;
+
   /** Emits when the user clicks "Submit Answers" — payload is questionId -> selected option ID. */
   @Output() submitAnswers = new EventEmitter<Map<string, string>>();
 
@@ -470,6 +473,73 @@ export class WizardComponent implements OnChanges {
     }
     
     return Math.min(entryIndex, this.definition.entries.length - 1);
+  }
+
+  /**
+   * Maps an entry index to the corresponding resolved step index.
+   * Choice entries map to their choice resolved step; variant steps are skipped.
+   */
+  getResolvedIndexForEntry(entryIndex: number): number {
+    if (!this.definition) return entryIndex;
+    let resolvedIndex = 0;
+    for (let i = 0; i < entryIndex; i++) {
+      const entry = this.definition.entries[i];
+      resolvedIndex++;
+      if (typeof entry !== 'string') {
+        const choice = entry as WizardChoicePoint;
+        const selectedVariants = this.choiceSelections.get(choice.label) || new Set();
+        resolvedIndex += selectedVariants.size;
+      }
+    }
+    return resolvedIndex;
+  }
+
+  isEntryAccessible(entryIndex: number): boolean {
+    // Any entry at or before the furthest reached is always accessible
+    if (entryIndex <= this.maxReachedEntryIndex) return true;
+    const resolvedIndex = this.getResolvedIndexForEntry(entryIndex);
+    return this.isStepAccessible(resolvedIndex);
+  }
+
+  isEntryCompleted(entryIndex: number): boolean {
+    if (!this.definition) return false;
+    // If the user has navigated past this entry in a prior session, show it as green
+    if (entryIndex < this.maxReachedEntryIndex) return true;
+    const entry = this.definition.entries[entryIndex];
+    const resolvedIndex = this.getResolvedIndexForEntry(entryIndex);
+    const resolved = this.resolvedSteps[resolvedIndex];
+    if (!resolved) return false;
+    if (typeof entry !== 'string') {
+      return this.isChoiceCompleted(resolved.choice!);
+    }
+    return this.isResolvedStepCompleted(resolvedIndex);
+  }
+
+  isEntryActive(entryIndex: number): boolean {
+    const resolvedIndex = this.getResolvedIndexForEntry(entryIndex);
+    if (!this.definition) return false;
+    const entry = this.definition.entries[entryIndex];
+    if (typeof entry !== 'string') {
+      // Active if we are on the choice step or any of its variant steps
+      const choice = entry as WizardChoicePoint;
+      const selectedVariants = this.choiceSelections.get(choice.label) || new Set();
+      const lastVariantResolved = resolvedIndex + selectedVariants.size;
+      return this.currentStepIndex >= resolvedIndex && this.currentStepIndex <= lastVariantResolved;
+    }
+    return this.currentStepIndex === resolvedIndex;
+  }
+
+  goToEntry(entryIndex: number): void {
+    const resolvedIndex = this.getResolvedIndexForEntry(entryIndex);
+    this.goToStep(resolvedIndex);
+  }
+
+  getEntryLabel(entryIndex: number): string {
+    if (!this.definition) return '';
+    const entry = this.definition.entries[entryIndex];
+    if (typeof entry !== 'string') return (entry as WizardChoicePoint).label;
+    const resolvedIndex = this.getResolvedIndexForEntry(entryIndex);
+    return this.getStepLabel(resolvedIndex);
   }
 
   isStepAccessible(index: number): boolean {

@@ -23,6 +23,7 @@ export class CertificationWizardComponent implements OnInit, OnDestroy {
   definition = this.modelService.currentCertification$;
   loading = this.modelService.currentCertificationLoading$;
   error = this.modelService.currentCertificationError$;
+  maxReachedEntryIndex = this.modelService.maxReachedEntryIndex$;
 
   /** Current step index derived from URL page parameter (0-based). */
   initialStepIndex = 0;

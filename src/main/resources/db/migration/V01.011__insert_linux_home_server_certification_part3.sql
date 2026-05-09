@@ -1,5 +1,5 @@
 -- Continue: Page entries
--- Entry 1: Direct intro step
+-- Entry 1: Direct intro step (Welcome to Your Home Server Journey)
 INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
 VALUES ('4df3650f-6849-4cd7-8eaa-611b06adf437', 'linux-home-server', 'DIRECT', 0, '9b67ca79-603b-4d2d-8bdb-af8bef07b388', NULL, NULL, NULL, NULL);
 
@@ -7,28 +7,43 @@ VALUES ('4df3650f-6849-4cd7-8eaa-611b06adf437', 'linux-home-server', 'DIRECT', 0
 INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
 VALUES ('0c50d416-1d9d-4987-99ef-77ee562083df', 'linux-home-server', 'CHOICE', 1, NULL, 'Installing Linux', 'Choose how to create your bootable USB drive based on the operating system you are starting from.', 1, 1);
 
--- Choice variants
+-- Choice variants for installing Linux
 INSERT INTO T_choice_variant (id, page_entry_id, label, description, step_id, sequence_order)
 VALUES ('3e3276e5-b91e-4a18-aff7-0244ff19a9af', '0c50d416-1d9d-4987-99ef-77ee562083df', 'Starting from Windows (Rufus)', 'Use Rufus on Windows to create the bootable USB drive.', 'dab542a6-77df-4032-b273-d9f7fa027993', 0);
 
 INSERT INTO T_choice_variant (id, page_entry_id, label, description, step_id, sequence_order)
 VALUES ('4c070ec3-0d53-4323-840a-6d38ab944738', '0c50d416-1d9d-4987-99ef-77ee562083df', 'Starting from Linux (dd)', 'Use the dd command on Linux to create the bootable USB drive.', 'f6676877-8b20-4558-9b3b-91c6ffa7e1d6', 1);
 
--- Entry 3-8: Direct steps
+-- Entry 3: Configuring the SSH Daemon (sshd)
 INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
-VALUES ('878fefaa-6880-4761-8af6-2c121b37e53c', 'linux-home-server', 'DIRECT', 2, '4b4023e4-e123-42fe-8fb9-154cb11d2833', NULL, NULL, NULL, NULL);
+VALUES ('3fd5503b-a4b4-46ab-bb8a-36490d7ebaf2', 'linux-home-server', 'DIRECT', 2, 'ec4bcbdd-dabc-4c76-a967-470c14e8adc4', NULL, NULL, NULL, NULL);
 
+-- Entry 4: Choice for connecting to the server using SSH (NEW)
 INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
-VALUES ('e1e758e4-b0ab-4196-9c66-7aaddeb4ea98', 'linux-home-server', 'DIRECT', 3, '05782de5-0676-48bc-825e-a126969086bb', NULL, NULL, NULL, NULL);
+VALUES ('c7a8b9d0-e1f2-4a3b-5c6d-7e8f9a0b1c2d', 'linux-home-server', 'CHOICE', 3, NULL, 'Connecting to the Server Using SSH', 'Choose how to connect to your server based on the operating system you are using on your local machine.', 1, 1);
 
-INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
-VALUES ('3fd5503b-a4b4-46ab-bb8a-36490d7ebaf2', 'linux-home-server', 'DIRECT', 4, 'ec4bcbdd-dabc-4c76-a967-470c14e8adc4', NULL, NULL, NULL, NULL);
+-- Choice variants for SSH connection
+INSERT INTO T_choice_variant (id, page_entry_id, label, description, step_id, sequence_order)
+VALUES ('d8e9f0a1-b2c3-4d4e-5f6a-7b8c9d0e1f2a', 'c7a8b9d0-e1f2-4a3b-5c6d-7e8f9a0b1c2d', 'Connecting from Windows', 'Use the built-in OpenSSH client on Windows to connect to your server and transfer files with SCP.', 'a1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e', 0);
 
-INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
-VALUES ('4856ed6e-4100-46ca-afd4-0113215bd31c', 'linux-home-server', 'DIRECT', 5, 'ff7f23e8-1c03-467a-a1da-7abfa901bacf', NULL, NULL, NULL, NULL);
+INSERT INTO T_choice_variant (id, page_entry_id, label, description, step_id, sequence_order)
+VALUES ('e9f0a1b2-c3d4-4e5f-6a7b-8c9d0e1f2a3b', 'c7a8b9d0-e1f2-4a3b-5c6d-7e8f9a0b1c2d', 'Connecting from Linux', 'Use the OpenSSH client on Linux to connect to your server and transfer files with SCP.', 'b2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f', 1);
 
+-- Entry 5: Installing and Configuring Nginx
 INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
-VALUES ('6f67fca6-e2af-44ff-8128-cf1b4804c759', 'linux-home-server', 'DIRECT', 6, '6d688465-40a8-4de1-b60c-7794b07492a5', NULL, NULL, NULL, NULL);
+VALUES ('878fefaa-6880-4761-8af6-2c121b37e53c', 'linux-home-server', 'DIRECT', 4, '4b4023e4-e123-42fe-8fb9-154cb11d2833', NULL, NULL, NULL, NULL);
+
+-- Entry 6: Setting Up UFW (Uncomplicated Firewall)
+INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
+VALUES ('e1e758e4-b0ab-4196-9c66-7aaddeb4ea98', 'linux-home-server', 'DIRECT', 5, '05782de5-0676-48bc-825e-a126969086bb', NULL, NULL, NULL, NULL);
+
+-- Entry 7: Setting Up Port Forwarding on Your Router
+INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
+VALUES ('4856ed6e-4100-46ca-afd4-0113215bd31c', 'linux-home-server', 'DIRECT', 6, 'ff7f23e8-1c03-467a-a1da-7abfa901bacf', NULL, NULL, NULL, NULL);
+
+-- Entry 8: Setting Up Dynamic DNS with No-IP
+INSERT INTO T_page_entry (id, certification_id, entry_type, sequence_order, direct_step_id, choice_label, choice_description, min_required, max_required)
+VALUES ('6f67fca6-e2af-44ff-8128-cf1b4804c759', 'linux-home-server', 'DIRECT', 7, '6d688465-40a8-4de1-b60c-7794b07492a5', NULL, NULL, NULL, NULL);
 
 -- Questions and answers for install-windows step
 INSERT INTO T_question (id, step_id, question_key, text, sequence_order)

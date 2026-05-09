@@ -2,6 +2,7 @@
   <wizard
     [definition]="definition()"
     [initialStepIndex]="initialStepIndex"
+    [maxReachedEntryIndex]="maxReachedEntryIndex()"
     (submitAnswers)="onSubmitAnswers($event)"
     (viewOverview)="navigateToOverview()"
     (stepChange)="onStepChange($event)"></wizard>
