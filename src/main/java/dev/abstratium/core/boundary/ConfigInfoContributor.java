@@ -1,12 +1,12 @@
 package dev.abstratium.core.boundary;
 
+import java.util.Map;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import dev.abstratium.core.BuildInfo;
 import io.quarkus.info.runtime.spi.InfoContributor;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
-import java.util.Map;
 
 /**
  * Contributes runtime configuration information to the /info endpoint.
@@ -16,11 +16,9 @@ import java.util.Map;
 public class ConfigInfoContributor implements InfoContributor {
 
     // TODO any config that you want to expose
-    // @Inject
     // @ConfigProperty(name = "allow.signup")
     // boolean allowSignup;
 
-    @Inject
     @ConfigProperty(name = "build.version")
     String buildVersion;
 

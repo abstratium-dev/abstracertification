@@ -2,6 +2,7 @@ import { Injectable, signal, Signal } from '@angular/core';
 
 export interface Config {
   logLevel: string;
+  provideAiHelp: boolean;
 }
 
 @Injectable({

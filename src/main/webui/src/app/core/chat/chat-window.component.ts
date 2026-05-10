@@ -30,25 +30,20 @@ export interface ChatMessage {
             [class.user-message]="message.role === 'user'"
             [class.assistant-message]="message.role === 'assistant'">
             <div class="message-content">
-              <!-- Render markdown for assistant messages, plain text for user messages -->
+              <!-- Render plain text for user messages -->
               <div *ngIf="message.role === 'user'" class="user-text">{{ message.content }}</div>
               
-              <!-- For assistant messages: render plain text during streaming, markdown when complete -->
-              <div *ngIf="message.role === 'assistant'" 
-                   class="assistant-content">
-                <!-- Show plain text with pre-wrap during streaming or last message -->
-                <div *ngIf="isStreamingMessage(message)" 
-                     class="streaming-text">{{ message.content }}</div>
-                <!-- Show proper markdown for completed messages -->
-                <markdown *ngIf="!isStreamingMessage(message)" 
-                          [data]="message.content" 
-                          class="assistant-markdown"></markdown>
-              </div>
+              <!-- Show raw text while streaming, render markdown once complete -->
+              <pre *ngIf="message.role === 'assistant' && isLoading && isLastMessage(message)" 
+                   class="assistant-streaming">{{ message.content }}</pre>
+              <markdown *ngIf="message.role === 'assistant' && !(isLoading && isLastMessage(message))" 
+                        [data]="message.content" 
+                        class="assistant-markdown"></markdown>
             </div>
             <div class="message-time">{{ formatTime(message.timestamp) }}</div>
           </div>
           
-          <div *ngIf="isLoading" class="message assistant-message">
+          <div *ngIf="isLoading && lastAssistantMessageIsEmpty()" class="message assistant-message">
             <div class="message-content">
               <span class="typing-indicator">Thinking...</span>
             </div>
@@ -96,7 +91,7 @@ export class ChatWindowComponent {
   @Output() clearChatEvent = new EventEmitter<void>();
 
   currentMessage: string = '';
-  isCollapsed: boolean = false;
+  isCollapsed: boolean = true;
 
   toggleCollapse(): void {
     this.isCollapsed = !this.isCollapsed;
@@ -129,18 +124,13 @@ export class ChatWindowComponent {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  isStreamingMessage(message: ChatMessage): boolean {
-    // The last assistant message is considered streaming if loading is active
-    if (message.role !== 'assistant') {
-      return false;
-    }
-    
-    // Check if this is the last assistant message and loading is active
-    const lastAssistantMessage = [...this.messages]
-      .reverse()
-      .find(msg => msg.role === 'assistant');
-    
-    return lastAssistantMessage === message && this.isLoading;
+  isLastMessage(message: ChatMessage): boolean {
+    return this.messages.length > 0 && this.messages[this.messages.length - 1] === message;
+  }
+
+  lastAssistantMessageIsEmpty(): boolean {
+    const last = this.messages[this.messages.length - 1];
+    return !last || last.role !== 'assistant' || !last.content;
   }
 
   scrollToBottom(): void {

@@ -71,17 +71,23 @@ export class ChatService {
             
             for (const line of lines) {
               const trimmedLine = line.trim();
-              if (trimmedLine && !trimmedLine.startsWith('data:')) {
-                // langchain4j Multi<String> sends raw tokens, not wrapped in "data: "
-                observer.next(trimmedLine);
-              } else if (trimmedLine.startsWith('data: ')) {
+              if (trimmedLine.startsWith('data: ')) {
                 const data = trimmedLine.slice(6); // Remove 'data: ' prefix
                 if (data.startsWith('[ERROR]')) {
                   observer.error(new Error(data.slice(7))); // Remove '[ERROR] ' prefix
                   return;
-                } else if (data.trim()) {
-                  observer.next(data);
+                } else {
+                  // JSON-decode the token to restore embedded newlines/special chars
+                  try {
+                    const token = JSON.parse(data);
+                    observer.next(token);
+                  } catch {
+                    observer.next(data);
+                  }
                 }
+              } else if (trimmedLine && !trimmedLine.startsWith(':')) {
+                // langchain4j Multi<String> sends raw tokens, not wrapped in "data: "
+                observer.next(line);
               }
             }
             

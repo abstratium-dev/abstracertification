@@ -174,7 +174,7 @@
     </section>
 
     <!-- AI Chat Assistant -->
-    <section class="chat-section" *ngIf="currentStep">
+    <section class="chat-section" *ngIf="currentStep && provideAiHelp()">
       <app-chat-window
         [certificationId]="certificationId || ''"
         [pageId]="currentStep.id || ''"

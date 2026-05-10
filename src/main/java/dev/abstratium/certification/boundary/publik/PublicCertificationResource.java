@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import io.smallrye.mutiny.Multi;
 import org.jboss.logging.Logger;
@@ -30,6 +32,8 @@ import jakarta.ws.rs.core.StreamingOutput;
 public class PublicCertificationResource {
 
     private static final Logger LOG = Logger.getLogger(PublicCertificationResource.class);
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Inject
     CertificationService certificationService;
@@ -157,8 +161,9 @@ public class PublicCertificationResource {
                     responseStream.subscribe().with(
                         token -> {
                             try {
-                                // Format each token as proper SSE
-                                output.write(("data: " + token + "\n\n").getBytes());
+                                // JSON-encode the token so newlines survive SSE transport
+                                String jsonToken = MAPPER.writeValueAsString(token);
+                                output.write(("data: " + jsonToken + "\n\n").getBytes());
                                 output.flush();
                             } catch (Exception e) {
                                 LOG.errorf(e, "Error writing SSE token");

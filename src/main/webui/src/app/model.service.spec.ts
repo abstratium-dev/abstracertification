@@ -21,34 +21,34 @@ describe('ModelService', () => {
 
   describe('Config Management', () => {
     it('should set config', () => {
-      service.setConfig({ logLevel: 'INFO' });
-      expect(service.config$()).toEqual({ logLevel: 'INFO' });
+      service.setConfig({ logLevel: 'INFO', provideAiHelp: false });
+      expect(service.config$()).toEqual({ logLevel: 'INFO', provideAiHelp: false });
     });
 
     it('should update config', () => {
-      service.setConfig({ logLevel: 'INFO' });
-      expect(service.config$()).toEqual({ logLevel: 'INFO' });
+      service.setConfig({ logLevel: 'INFO', provideAiHelp: false });
+      expect(service.config$()).toEqual({ logLevel: 'INFO', provideAiHelp: false });
 
-      service.setConfig({ logLevel: 'DEBUG' });
-      expect(service.config$()).toEqual({ logLevel: 'DEBUG' });
+      service.setConfig({ logLevel: 'DEBUG', provideAiHelp: true });
+      expect(service.config$()).toEqual({ logLevel: 'DEBUG', provideAiHelp: true });
     });
   });
 
   describe('Signal Reactivity', () => {
     it('should emit signal updates for config', () => {
-      service.setConfig({ logLevel: 'WARN' });
-      expect(service.config$()).toEqual({ logLevel: 'WARN' });
+      service.setConfig({ logLevel: 'WARN', provideAiHelp: false });
+      expect(service.config$()).toEqual({ logLevel: 'WARN', provideAiHelp: false });
 
-      service.setConfig({ logLevel: 'ERROR' });
-      expect(service.config$()).toEqual({ logLevel: 'ERROR' });
+      service.setConfig({ logLevel: 'ERROR', provideAiHelp: false });
+      expect(service.config$()).toEqual({ logLevel: 'ERROR', provideAiHelp: false });
     });
   });
 
   describe('Service Singleton', () => {
     it('should be a singleton across injections', () => {
       const service2 = TestBed.inject(ModelService);
-      service.setConfig({ logLevel: 'TRACE' });
-      expect(service2.config$()).toEqual({ logLevel: 'TRACE' });
+      service.setConfig({ logLevel: 'TRACE', provideAiHelp: false });
+      expect(service2.config$()).toEqual({ logLevel: 'TRACE', provideAiHelp: false });
     });
   });
 });

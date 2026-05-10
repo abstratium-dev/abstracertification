@@ -31,7 +31,7 @@ describe('Controller', () => {
 
   describe('loadConfig', () => {
     it('should load config and update model service', async () => {
-      const mockConfig = { logLevel: 'INFO' };
+      const mockConfig = { logLevel: 'INFO', provideAiHelp: false };
 
       const configPromise = controller.loadConfig();
 

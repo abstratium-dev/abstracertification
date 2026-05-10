@@ -1,9 +1,10 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject, computed, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MarkdownComponent, type MermaidAPI } from 'ngx-markdown';
 import { ThemeService } from '../theme.service';
 import { ChatWindowComponent, ChatMessage } from '../chat/chat-window.component';
 import { ChatService, ChatRequest } from '../chat/chat.service';
+import { ModelService } from '../../model.service';
 import {
   WizardDefinition, WizardStep, WizardChoicePoint, WizardEntry,
   WizardPageState, WizardQuestion, WizardAnswerResults
@@ -84,7 +85,10 @@ export class WizardComponent implements OnChanges {
   chatMessages: ChatMessage[] = [];
   isChatLoading: boolean = false;
   private chatService = inject(ChatService);
+  private modelService = inject(ModelService);
   private chatSessionId: string = '';
+
+  provideAiHelp: Signal<boolean> = computed(() => this.modelService.config$()?.provideAiHelp ?? false);
 
   readonly FONT_SIZE_KEY = 'wizard-font-size';
   fontSize: 'small' | 'medium' | 'large' = this.loadFontSize();

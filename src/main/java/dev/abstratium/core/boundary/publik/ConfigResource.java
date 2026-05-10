@@ -1,9 +1,9 @@
 package dev.abstratium.core.boundary.publik;
 
-import dev.abstratium.core.BuildInfo;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
+import dev.abstratium.core.BuildInfo;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -17,19 +17,24 @@ public class ConfigResource {
     @ConfigProperty(name = "client.log.level")
     String clientLogLevel;
 
+    @ConfigProperty(name = "provide.ai.help")
+    boolean provideAiHelp;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public SuccessResponse config() {
-        return new SuccessResponse(clientLogLevel, BuildInfo.BUILD_TIMESTAMP);
+        return new SuccessResponse(clientLogLevel, provideAiHelp, BuildInfo.BUILD_TIMESTAMP);
     }
 
     @RegisterForReflection
     public static class SuccessResponse {
         public String logLevel;
+        public boolean provideAiHelp;
         public String baselineBuildTimestamp;
         
-        public SuccessResponse(String logLevel, String baselineBuildTimestamp) {
+        public SuccessResponse(String logLevel, boolean provideAiHelp, String baselineBuildTimestamp) {
             this.logLevel = logLevel;
+            this.provideAiHelp = provideAiHelp;
             this.baselineBuildTimestamp = baselineBuildTimestamp;
         }
     }

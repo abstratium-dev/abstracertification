@@ -46,7 +46,7 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
   - wireguard vpn (peer to peer but as "client" and "server")
   - SSL with certbot from letsencrypt
     - including how to make it so that they are auto updated
-
+  - move ai help to be part of the certification definition, not for the entire server. or "as well as"
 
 - [ ] - Update SECURITY_DESIGN.md with project-specific information
 - [ ] - Update SECURITY.md with project-specific information

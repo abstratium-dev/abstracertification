@@ -103,19 +103,16 @@
           white-space: pre-wrap;
         }
 
-        .streaming-text {
+        .assistant-streaming {
+          font-family: inherit;
+          font-size: inherit;
           white-space: pre-wrap;
+          word-wrap: break-word;
+          margin: 0;
+          padding: 0;
+          background: none;
+          border: none;
           color: var(--color-text-primary);
-          line-height: 1.5;
-          
-          // Basic formatting to make it look similar to markdown
-          strong {
-            font-weight: 600;
-          }
-          
-          em {
-            font-style: italic;
-          }
         }
 
         .assistant-markdown {
