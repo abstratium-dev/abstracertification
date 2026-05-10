@@ -34,6 +34,11 @@ export class CertificationWizardComponent implements OnInit, OnDestroy {
   private hasValidatedPage = false;
   private isNavigatingFromStepChange = false;
 
+  /** Public getter for certification ID to make it accessible in template */
+  get certificationIdPublic(): string {
+    return this.certificationId;
+  }
+
   ngOnInit(): void {
     this.routeSub = this.route.paramMap.subscribe((params: ParamMap) => {
       const newCertificationId = params.get('certificationId') ?? '';

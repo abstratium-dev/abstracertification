@@ -173,6 +173,18 @@
       </ol>
     </section>
 
+    <!-- AI Chat Assistant -->
+    <section class="chat-section" *ngIf="currentStep">
+      <app-chat-window
+        [certificationId]="certificationId || ''"
+        [pageId]="currentStep.id || ''"
+        [messages]="chatMessages"
+        [isLoading]="isChatLoading"
+        (sendMessageEvent)="onChatSendMessage($event)"
+        (clearChatEvent)="onChatClearChat()">
+      </app-chat-window>
+    </section>
+
     <!-- Page-level feedback -->
     <section class="page-feedback-section" *ngIf="currentStep">
       <div class="page-feedback-header">

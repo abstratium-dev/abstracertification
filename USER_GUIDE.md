@@ -39,15 +39,26 @@ This project will automatically create all necessary tables and any initial data
 
 New versions will update the database as needed.
 
-### Generate TODO
+### Generate Environment Variables
 
-TODO any env vars that need generating are to be described here.
-
-1. **Generate TODO** (32+ characters recommended):
+1. **Generate Cookie Encryption Secret** (32+ characters recommended):
    ```bash
    openssl rand -base64 32
    ```
-   Use this output for `TODO_ENV_VAR_NAME`.
+   Use this output for `COOKIE_ENCRYPTION_SECRET`.
+
+2. **Generate CSRF Token Signature Key** (64+ characters recommended):
+   ```bash
+   openssl rand -base64 64 | tr -d '\n'
+   ```
+   Use this output for `CSRF_TOKEN_SIGNATURE_KEY`.
+
+3. **Generate Anthropic Claude API Key**:
+   - Visit https://console.anthropic.com/
+   - Create an account or sign in
+   - Navigate to API Keys section
+   - Generate a new API key
+   - Use this output for `ANTHROPIC_API_KEY`
 
 ### Pull and Run the Docker Container
 
@@ -73,6 +84,7 @@ _Replace all `TODO_...` values with the values generated above.
      -e CSRF_TOKEN_SIGNATURE_KEY="YOUR_CSRF_TOKEN_SIGNATURE_KEY" \
      -e ABSTRATIUM_CLIENT_ID="abstratium-abstracertification" \
      -e ABSTRATIUM_CLIENT_SECRET="YOUR_OIDC_CLIENT_SECRET" \
+     -e ANTHROPIC_API_KEY="YOUR_ANTHROPIC_API_KEY" \
      ghcr.io/abstratium-dev/abstracertification:latest
    ```
 
@@ -82,6 +94,8 @@ _Replace all `TODO_...` values with the values generated above.
    - `QUARKUS_DATASOURCE_PASSWORD`: Database password (use strong, unique password)
    - `COOKIE_ENCRYPTION_SECRET`: Cookie encryption secret (min 32 chars, generate with `openssl rand -base64 32`)
    - `CSRF_TOKEN_SIGNATURE_KEY`: CSRF token signature key (min 32 chars, generate with `openssl rand -base64 64 | tr -d '\n'`)
+   - `ABSTRATIUM_CLIENT_SECRET`: OAuth2 client secret from authentication server
+   - `ANTHROPIC_API_KEY`: Anthropic Claude API key for AI chat functionality (get from https://console.anthropic.com/)
    
    **Optional Environment Variables:**
    - `DEPLOYMENT_ENV`: Deployment environment name (default: `dev`)
@@ -116,6 +130,49 @@ TODO
 ## Account and Role Management
 
 This component requires that users can authenticate using an oauth authorization server. That requires that an administrator signs into something like `abstratium-abstrauth` first, to create the oauth2 client. The callback url should be `http://localhost:8085/oauth/callback` and one for the production environment, also ending in `/oauth/callback`. Use the `client_id` and `client_secret` that it provides, to set the values of the environment variables above, so that users can sign in.
+
+## AI Chat Functionality
+
+This application includes an AI-powered chat assistant that uses Anthropic's Claude API to help users with certification content.
+
+### Features
+
+- **Context-Aware Assistance**: The AI assistant has access to the current certification content, including instructions, key concepts, and learning objectives
+- **Smart Constraints**: The assistant is configured to not directly answer assessment questions, but can provide hints and explanations
+- **Streaming Responses**: Chat responses are streamed in real-time for better user experience
+- **Session Management**: Chat sessions are managed client-side with UUID-based session identifiers
+
+### Usage
+
+1. **Chat Interface**: A chat window is available above the question/answer section on each certification page
+2. **Session Persistence**: Chat history is stored client-side and sent with each new message to maintain context
+3. **API Endpoint**: The chat functionality is available at `/public/certifications/{id}/chat`
+
+### API Usage
+
+```bash
+curl -X POST http://localhost:41085/public/certifications/{certification-id}/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Can you explain this concept better?",
+    "certificationId": "linux-home-server",
+    "pageId": "step-1",
+    "sessionId": "uuid-v4-generated-by-client",
+    "history": [
+      {"role": "user", "content": "Previous question"},
+      {"role": "assistant", "content": "Previous answer"}
+    ]
+  }'
+```
+
+### Configuration
+
+The AI chat functionality requires:
+
+- `ANTHROPIC_API_KEY`: Your Anthropic Claude API key
+- The chat uses Claude 3.5 Sonnet model by default
+- Responses are configured with 0.7 temperature for balanced creativity
+- Maximum token limit is set to 4000 tokens per response
 
 ## TODO
 

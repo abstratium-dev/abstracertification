@@ -2,6 +2,8 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, injec
 import { CommonModule } from '@angular/common';
 import { MarkdownComponent, type MermaidAPI } from 'ngx-markdown';
 import { ThemeService } from '../theme.service';
+import { ChatWindowComponent, ChatMessage } from '../chat/chat-window.component';
+import { ChatService, ChatRequest } from '../chat/chat.service';
 import {
   WizardDefinition, WizardStep, WizardChoicePoint, WizardEntry,
   WizardPageState, WizardQuestion, WizardAnswerResults
@@ -25,7 +27,7 @@ export interface ResolvedWizardStep {
  */
 @Component({
   selector: 'wizard',
-  imports: [CommonModule, MarkdownComponent],
+  imports: [CommonModule, MarkdownComponent, ChatWindowComponent],
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.scss',
 })
@@ -76,6 +78,13 @@ export class WizardComponent implements OnChanges {
   choiceSelections: Map<string, Set<number>> = new Map();
   shuffledQuestions: Map<string, WizardQuestion[]> = new Map();
   infoExpandedState: Map<string, boolean> = new Map();
+
+  // Chat functionality
+  @Input() certificationId: string = '';
+  chatMessages: ChatMessage[] = [];
+  isChatLoading: boolean = false;
+  private chatService = inject(ChatService);
+  private chatSessionId: string = '';
 
   readonly FONT_SIZE_KEY = 'wizard-font-size';
   fontSize: 'small' | 'medium' | 'large' = this.loadFontSize();
@@ -791,5 +800,69 @@ export class WizardComponent implements OnChanges {
         state.error = error;
       }
     }
+  }
+
+  // Chat functionality methods
+  onChatSendMessage(event: { message: string; history: ChatMessage[] }): void {
+    if (!this.currentStep || !this.certificationId) {
+      return;
+    }
+
+    // Initialize session ID if not set
+    if (!this.chatSessionId) {
+      this.chatSessionId = this.chatService.generateSessionId();
+    }
+
+    // Add user message to chat
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: event.message,
+      timestamp: new Date()
+    };
+    this.chatMessages = [...event.history, userMessage];
+    this.isChatLoading = true;
+
+    // Prepare chat request
+    const chatRequest: ChatRequest = {
+      message: event.message,
+      certificationId: this.certificationId,
+      pageId: this.currentStep.id,
+      sessionId: this.chatSessionId,
+      history: event.history
+    };
+
+    // Send message to chat service
+    let assistantMessage: ChatMessage = {
+      role: 'assistant',
+      content: '',
+      timestamp: new Date()
+    };
+    this.chatMessages = [...this.chatMessages, assistantMessage];
+    
+    this.chatService.sendMessage(chatRequest).subscribe({
+      next: (chunk) => {
+        // Accumulate streaming chunks
+        assistantMessage.content += chunk;
+        // Update the messages array to trigger UI updates
+        this.chatMessages = [...this.chatMessages];
+      },
+      error: (error) => {
+        console.error('Chat error:', error);
+        // Replace partial message with error message
+        assistantMessage.content = 'Sorry, I encountered an error. Please try again later.';
+        this.chatMessages = [...this.chatMessages];
+        this.isChatLoading = false;
+      },
+      complete: () => {
+        // Streaming completed
+        this.isChatLoading = false;
+      }
+    });
+  }
+
+  onChatClearChat(): void {
+    this.chatMessages = [];
+    // Generate new session ID for fresh conversation
+    this.chatSessionId = this.chatService.generateSessionId();
   }
 }
