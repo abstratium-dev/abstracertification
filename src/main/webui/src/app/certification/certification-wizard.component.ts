@@ -176,4 +176,29 @@ export class CertificationWizardComponent implements OnInit, OnDestroy {
       this.modelService.setChoiceSelections(label, selectedIndices);
     }
   }
+
+  /**
+   * Handles feedback submission from the wizard.
+   * Submits feedback to the backend via the controller.
+   */
+  onSubmitFeedback(event: { feedbackType: 'INSTRUCTION' | 'PAGE'; targetId: string; feedbackText: string }): void {
+    console.log('[DEBUG] submitFeedback:', event);
+    this.controller.submitFeedback(this.certificationId, event.feedbackType, event.targetId, event.feedbackText)
+      .subscribe({
+        next: (response) => {
+          console.log('[DEBUG] feedback submitted:', response);
+          // Notify wizard of successful submission
+          this.wizardComponent.markFeedbackSubmitted(event.targetId, event.feedbackType);
+        },
+        error: (err) => {
+          console.error('Error submitting feedback:', err);
+          // Notify wizard of failed submission
+          this.wizardComponent.markFeedbackError(
+            event.targetId,
+            event.feedbackType,
+            'Failed to submit feedback. Please try again.'
+          );
+        }
+      });
+  }
 }

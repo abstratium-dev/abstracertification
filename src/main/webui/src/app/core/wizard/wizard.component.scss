@@ -40,11 +40,11 @@
 .wizard-page {
   background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary);
   border-radius: 8px; padding: 2rem; margin-bottom: 2rem;
-  font-size: 1rem; line-height: 1.6;
-  &.font-small { font-size: 0.875rem; line-height: 1.5; }
-  &.font-large { font-size: 1.125rem; line-height: 1.7; }
+  font-size: 1.25rem; line-height: 1.6;
+  &.font-small { font-size: 1.00rem; line-height: 1.5; }
+  &.font-large { font-size: 1.50rem; line-height: 1.7; }
 }
-.page-title { margin: 0 0 1.5rem 0; color: var(--color-primary); font-size: 1.75rem; }
+.page-title { margin: 0 0 1.75rem 0; color: var(--color-primary); font-size: 1.75rem; }
 .info-section {
   margin-bottom: 2rem;
   .info-header {
@@ -103,7 +103,7 @@
   padding: 0.75rem 1rem; font-family: 'Courier New', monospace; font-size: 0.9rem;
   margin-bottom: 0.5rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all;
 }
-.step-note { margin: 0.25rem 0 0 0; font-size: 0.875rem; font-style: italic; color: var(--color-text-secondary); }
+.step-note { margin: 0.25rem 0 0 0; font-size: 1.0rem; font-style: italic; color: var(--color-text-secondary); }
 
 .questions-section {
   margin-bottom: 2rem; padding-top: 1.5rem; border-top: 2px solid var(--color-border-primary);
@@ -167,6 +167,143 @@
 }
 .wizard-actions { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border-primary); }
 .completion-message { color: var(--color-success-text); font-weight: 600; font-size: 1.1rem; }
+
+// --- Feedback styles ---
+.instruction-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.feedback-btn {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--color-bg-hover);
+  }
+
+  &.active {
+    background: var(--color-badge-primary-bg);
+  }
+}
+
+.feedback-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.page-feedback-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 6px;
+  background: var(--color-bg-secondary);
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: var(--color-bg-hover);
+  }
+
+  &.active {
+    border-color: var(--color-primary);
+    background: var(--color-badge-primary-bg);
+  }
+}
+
+.feedback-label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.page-feedback-section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--color-bg-tertiary);
+  border-radius: 8px;
+  border: 1px solid var(--color-border-primary);
+}
+
+.page-feedback-header {
+  display: flex;
+  justify-content: center;
+}
+
+.feedback-form {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 6px;
+
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border-primary);
+    border-radius: 4px;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    min-height: 80px;
+    margin-bottom: 0.75rem;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.page-feedback-form {
+  margin-top: 1rem;
+}
+
+.feedback-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.feedback-success {
+  padding: 0.75rem;
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success);
+  border-radius: 4px;
+
+  p {
+    margin: 0;
+    color: var(--color-success-text);
+    font-weight: 500;
+  }
+}
+
+.feedback-error {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error);
+  border-radius: 4px;
+  color: var(--color-error-text);
+  font-size: 0.875rem;
+}
 @media (max-width: 768px) {
   .wizard-container { padding: 1rem; }
   .wizard-page { padding: 1.25rem; }

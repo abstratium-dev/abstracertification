@@ -118,14 +118,107 @@
       <h3>What to do</h3>
       <ol class="instruction-list">
         <li *ngFor="let instr of currentStep.instructions" class="instruction-step">
-          <p class="step-text">{{ instr.text }}</p>
+          <div class="instruction-content">
+            <p class="step-text">{{ instr.text }}</p>
+            <button
+              type="button"
+              class="feedback-btn"
+              [class.active]="instructionFeedback.get(instr.id)?.isOpen"
+              (click)="toggleInstructionFeedback(instr.id)"
+              title="Give feedback on this instruction">
+              <span class="feedback-icon">&#128172;</span>
+            </button>
+          </div>
           <div *ngIf="instr.mermaid" class="mermaid-diagram">
             <markdown mermaid [mermaidOptions]="mermaidOptions()" [data]="'```mermaid\n' + instr.mermaid + '\n```'"></markdown>
           </div>
           <code *ngIf="instr.command" class="step-command">{{ instr.command }}</code>
           <p *ngIf="instr.note" class="step-note">{{ instr.note }}</p>
+
+          <!-- Inline feedback form for instruction -->
+          <div *ngIf="instructionFeedback.get(instr.id)?.isOpen" class="feedback-form">
+            <div *ngIf="instructionFeedback.get(instr.id)?.submitted" class="feedback-success">
+              <p>&#10003; Thank you for your feedback!</p>
+            </div>
+            <div *ngIf="!instructionFeedback.get(instr.id)?.submitted">
+              <textarea
+                [value]="instructionFeedback.get(instr.id)?.text || ''"
+                (input)="updateInstructionFeedbackText(instr.id, $any($event.target).value)"
+                placeholder="What do you think about this instruction? Any issues or suggestions?"
+                rows="3"
+                [disabled]="instructionFeedback.get(instr.id)?.submitting">
+              </textarea>
+              <div *ngIf="instructionFeedback.get(instr.id)?.error" class="feedback-error">
+                {{ instructionFeedback.get(instr.id)?.error }}
+              </div>
+              <div class="feedback-actions">
+                <button
+                  type="button"
+                  class="btn-secondary btn-small"
+                  (click)="toggleInstructionFeedback(instr.id)"
+                  [disabled]="instructionFeedback.get(instr.id)?.submitting">
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="btn-primary btn-small"
+                  (click)="submitInstructionFeedback(instr.id)"
+                  [disabled]="!instructionFeedback.get(instr.id)?.text?.trim() || instructionFeedback.get(instr.id)?.submitting">
+                  {{ instructionFeedback.get(instr.id)?.submitting ? 'Sending...' : 'Submit' }}
+                </button>
+              </div>
+            </div>
+          </div>
         </li>
       </ol>
+    </section>
+
+    <!-- Page-level feedback -->
+    <section class="page-feedback-section" *ngIf="currentStep">
+      <div class="page-feedback-header">
+        <button
+          type="button"
+          class="feedback-btn page-feedback-btn"
+          [class.active]="pageFeedback.get(currentStep.id)?.isOpen"
+          (click)="togglePageFeedback(currentStep.id)"
+          title="Give feedback on this page">
+          <span class="feedback-icon">&#128172;</span>
+          <span class="feedback-label">Feedback on this page</span>
+        </button>
+      </div>
+      <div *ngIf="pageFeedback.get(currentStep.id)?.isOpen" class="feedback-form page-feedback-form">
+        <div *ngIf="pageFeedback.get(currentStep.id)?.submitted" class="feedback-success">
+          <p>&#10003; Thank you for your feedback!</p>
+        </div>
+        <div *ngIf="!pageFeedback.get(currentStep.id)?.submitted">
+          <textarea
+            [value]="pageFeedback.get(currentStep.id)?.text || ''"
+            (input)="updatePageFeedbackText(currentStep.id, $any($event.target).value)"
+            placeholder="What do you think about this page? Any issues or suggestions?"
+            rows="4"
+            [disabled]="pageFeedback.get(currentStep.id)?.submitting">
+          </textarea>
+          <div *ngIf="pageFeedback.get(currentStep.id)?.error" class="feedback-error">
+            {{ pageFeedback.get(currentStep.id)?.error }}
+          </div>
+          <div class="feedback-actions">
+            <button
+              type="button"
+              class="btn-secondary btn-small"
+              (click)="togglePageFeedback(currentStep.id)"
+              [disabled]="pageFeedback.get(currentStep.id)?.submitting">
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn-primary btn-small"
+              (click)="submitPageFeedback(currentStep.id)"
+              [disabled]="!pageFeedback.get(currentStep.id)?.text?.trim() || pageFeedback.get(currentStep.id)?.submitting">
+              {{ pageFeedback.get(currentStep.id)?.submitting ? 'Sending...' : 'Submit' }}
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- QUESTIONS section -->

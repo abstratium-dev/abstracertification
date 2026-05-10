@@ -47,6 +47,9 @@ export class WizardComponent implements OnChanges {
   /** Emits when the user navigates to a different step (payload is 0-based step index). */
   @Output() stepChange = new EventEmitter<number>();
 
+  /** Emits when the user submits feedback — payload is { feedbackType, targetId, feedbackText }. */
+  @Output() submitFeedback = new EventEmitter<{ feedbackType: 'INSTRUCTION' | 'PAGE'; targetId: string; feedbackText: string }>();
+
   /** Initial choice selections to restore after page refresh: choiceLabel -> Set of variant indices. */
   @Input() initialChoiceSelections: Map<string, Set<number>> = new Map();
 
@@ -59,6 +62,11 @@ export class WizardComponent implements OnChanges {
   /** Tracks selected option ID per question. */
   selectedAnswers: Map<string, string | null> = new Map();
   answeredQuestions: Set<string> = new Set();
+
+  /** Feedback form state per instruction: instructionId -> { isOpen, text, submitting, submitted } */
+  instructionFeedback: Map<string, { isOpen: boolean; text: string; submitting: boolean; submitted: boolean; error: string | null }> = new Map();
+  /** Page-level feedback form state: stepId -> { isOpen, text, submitting, submitted } */
+  pageFeedback: Map<string, { isOpen: boolean; text: string; submitting: boolean; submitted: boolean; error: string | null }> = new Map();
   pageSubmitted = false;
   submitting = false;
 
@@ -69,7 +77,8 @@ export class WizardComponent implements OnChanges {
   shuffledQuestions: Map<string, WizardQuestion[]> = new Map();
   infoExpandedState: Map<string, boolean> = new Map();
 
-  fontSize: 'small' | 'medium' | 'large' = 'medium';
+  readonly FONT_SIZE_KEY = 'wizard-font-size';
+  fontSize: 'small' | 'medium' | 'large' = this.loadFontSize();
 
   private themeService = inject(ThemeService);
 
@@ -150,6 +159,16 @@ export class WizardComponent implements OnChanges {
     }
     this.shuffledQuestions.set(step.id, this.shuffleWithOptions([...step.questions]));
     this.infoExpandedState.set(step.id, step.infoExpanded ?? true);
+    // Initialize feedback state for each instruction
+    for (const instr of step.instructions) {
+      if (!this.instructionFeedback.has(instr.id)) {
+        this.instructionFeedback.set(instr.id, { isOpen: false, text: '', submitting: false, submitted: false, error: null });
+      }
+    }
+    // Initialize page-level feedback state
+    if (!this.pageFeedback.has(step.id)) {
+      this.pageFeedback.set(step.id, { isOpen: false, text: '', submitting: false, submitted: false, error: null });
+    }
   }
 
   /** Shuffles questions AND randomizes option order within each question. */
@@ -629,16 +648,25 @@ export class WizardComponent implements OnChanges {
 
   setFontSize(size: 'small' | 'medium' | 'large'): void {
     this.fontSize = size;
+    localStorage.setItem(this.FONT_SIZE_KEY, size);
+  }
+
+  private loadFontSize(): 'small' | 'medium' | 'large' {
+    const saved = localStorage.getItem(this.FONT_SIZE_KEY);
+    if (saved === 'small' || saved === 'medium' || saved === 'large') {
+      return saved;
+    }
+    return 'medium';
   }
 
   increaseFontSize(): void {
-    if (this.fontSize === 'small') this.fontSize = 'medium';
-    else if (this.fontSize === 'medium') this.fontSize = 'large';
+    if (this.fontSize === 'small') this.setFontSize('medium');
+    else if (this.fontSize === 'medium') this.setFontSize('large');
   }
 
   decreaseFontSize(): void {
-    if (this.fontSize === 'large') this.fontSize = 'medium';
-    else if (this.fontSize === 'medium') this.fontSize = 'small';
+    if (this.fontSize === 'large') this.setFontSize('medium');
+    else if (this.fontSize === 'medium') this.setFontSize('small');
   }
 
   // --- Info section handling ---
@@ -650,5 +678,118 @@ export class WizardComponent implements OnChanges {
   toggleInfoExpanded(stepId: string): void {
     const current = this.infoExpandedState.get(stepId) ?? true;
     this.infoExpandedState.set(stepId, !current);
+  }
+
+  // --- Feedback handling ---
+
+  toggleInstructionFeedback(instructionId: string): void {
+    const state = this.instructionFeedback.get(instructionId);
+    if (state) {
+      state.isOpen = !state.isOpen;
+      if (!state.isOpen) {
+        state.text = '';
+        state.error = null;
+      }
+    }
+  }
+
+  togglePageFeedback(stepId: string): void {
+    const state = this.pageFeedback.get(stepId);
+    if (state) {
+      state.isOpen = !state.isOpen;
+      if (!state.isOpen) {
+        state.text = '';
+        state.error = null;
+      }
+    }
+  }
+
+  updateInstructionFeedbackText(instructionId: string, text: string): void {
+    const state = this.instructionFeedback.get(instructionId);
+    if (state) {
+      state.text = text;
+      state.error = null;
+    }
+  }
+
+  updatePageFeedbackText(stepId: string, text: string): void {
+    const state = this.pageFeedback.get(stepId);
+    if (state) {
+      state.text = text;
+      state.error = null;
+    }
+  }
+
+  submitInstructionFeedback(instructionId: string): void {
+    const state = this.instructionFeedback.get(instructionId);
+    if (!state || !state.text.trim()) {
+      return;
+    }
+
+    state.submitting = true;
+    state.error = null;
+
+    this.submitFeedback.emit({
+      feedbackType: 'INSTRUCTION',
+      targetId: instructionId,
+      feedbackText: state.text.trim()
+    });
+  }
+
+  submitPageFeedback(stepId: string): void {
+    const state = this.pageFeedback.get(stepId);
+    if (!state || !state.text.trim()) {
+      return;
+    }
+
+    state.submitting = true;
+    state.error = null;
+
+    this.submitFeedback.emit({
+      feedbackType: 'PAGE',
+      targetId: stepId,
+      feedbackText: state.text.trim()
+    });
+  }
+
+  /**
+   * Called by parent component after feedback is successfully submitted.
+   * Marks the feedback form as submitted.
+   */
+  markFeedbackSubmitted(targetId: string, feedbackType: 'INSTRUCTION' | 'PAGE'): void {
+    if (feedbackType === 'INSTRUCTION') {
+      const state = this.instructionFeedback.get(targetId);
+      if (state) {
+        state.submitting = false;
+        state.submitted = true;
+        state.text = '';
+      }
+    } else {
+      const state = this.pageFeedback.get(targetId);
+      if (state) {
+        state.submitting = false;
+        state.submitted = true;
+        state.text = '';
+      }
+    }
+  }
+
+  /**
+   * Called by parent component if feedback submission failed.
+   */
+  markFeedbackError(targetId: string, feedbackType: 'INSTRUCTION' | 'PAGE', error: string): void {
+    if (feedbackType === 'INSTRUCTION') {
+      const state = this.instructionFeedback.get(targetId);
+      if (state) {
+        state.submitting = false;
+        state.error = error;
+      }
+    } else {
+      const state = this.pageFeedback.get(targetId);
+      if (state) {
+        state.submitting = false;
+        state.error = error;
+      }
+    }
   }
 }

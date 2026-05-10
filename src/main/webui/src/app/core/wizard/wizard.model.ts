@@ -6,6 +6,7 @@ export interface WizardInfoItem {
 
 /** A single actionable instruction within a wizard step's "What to do" section. */
 export interface WizardInstruction {
+  id: string;
   text: string;
   /** Optional shell command for the user to execute. */
   command?: string;

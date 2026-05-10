@@ -39,6 +39,7 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
     - fail2ban
     - disk encryption using abstravault
     - firewall
+    - disable ping
     - ssh hardening including certificate based authentication
     - nginx rate limiting
     - etc.

@@ -89,6 +89,18 @@ interface CheckAnswersResponse {
   results: { [questionId: string]: boolean };
 }
 
+interface SubmitFeedbackRequest {
+  feedbackType: 'INSTRUCTION' | 'PAGE';
+  targetId: string;
+  certificationId: string;
+  feedbackText: string;
+}
+
+interface FeedbackResponse {
+  id: string;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -214,6 +226,29 @@ export class CertificationController {
     );
   }
 
+  /**
+   * Submits user feedback to the backend.
+   * @param certificationId ID of the certification
+   * @param feedbackType Type of feedback: 'INSTRUCTION' or 'PAGE'
+   * @param targetId ID of the instruction or page entry being rated
+   * @param feedbackText The feedback text from the user
+   * @returns Observable of the feedback submission response
+   */
+  submitFeedback(
+    certificationId: string,
+    feedbackType: 'INSTRUCTION' | 'PAGE',
+    targetId: string,
+    feedbackText: string
+  ): Observable<FeedbackResponse> {
+    const payload: SubmitFeedbackRequest = {
+      feedbackType,
+      targetId,
+      certificationId,
+      feedbackText
+    };
+    return this.http.post<FeedbackResponse>(`/public/feedback`, payload);
+  }
+
   private mapToWizardStep(backendStep: BackendCertificationStep): WizardStep {
     const sortedInfoItems = [...backendStep.infoItems].sort((a, b) => a.sequenceOrder - b.sequenceOrder);
     const sortedInstructions = [...backendStep.instructions].sort((a, b) => a.sequenceOrder - b.sequenceOrder);
@@ -229,6 +264,7 @@ export class CertificationController {
       })),
       infoExpanded: backendStep.infoExpanded,
       instructions: sortedInstructions.map(instr => ({
+        id: instr.id,
         text: instr.text,
         command: instr.command,
         note: instr.note,

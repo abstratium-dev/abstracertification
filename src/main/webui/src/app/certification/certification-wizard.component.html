@@ -7,7 +7,8 @@
     (submitAnswers)="onSubmitAnswers($event)"
     (viewOverview)="navigateToOverview()"
     (stepChange)="onStepChange($event)"
-    (choiceSelectionsChange)="onChoiceSelectionsChange($event)"></wizard>
+    (choiceSelectionsChange)="onChoiceSelectionsChange($event)"
+    (submitFeedback)="onSubmitFeedback($event)"></wizard>
 </div>
 
 <div *ngIf="loading()" class="loading">
