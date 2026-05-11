@@ -112,7 +112,7 @@ class PublicCertificationResourceTest {
             .get("/public/certifications/linux-home-server")
             .then()
             .statusCode(200)
-            .body("pageEntries[0].directStepId", is("step-intro"))
+            .body("pageEntries[0].directStepId", is("9b67ca79-603b-4d2d-8bdb-af8bef07b388"))
             .body("pageEntries[0].entryType", is("DIRECT"));
     }
 
@@ -140,28 +140,30 @@ class PublicCertificationResourceTest {
 
     @Test
     void testCheckAnswersCorrect() {
-        // Submit a correct answer for q-nginx-1 (correct answer is a-nginx-1-1)
+        // Submit a correct answer for q-nginx-1 (question ID: a4de5a5b-3659-4646-b422-1e5e3ff60ba9)
+        // Correct answer option ID: 95176b9d-6aae-4fb4-b9f5-32d6f4121574
         given()
             .contentType("application/json")
-            .body(Map.of("answers", Map.of("q-nginx-1", "a-nginx-1-1")))
+            .body(Map.of("answers", Map.of("a4de5a5b-3659-4646-b422-1e5e3ff60ba9", "95176b9d-6aae-4fb4-b9f5-32d6f4121574")))
             .when()
             .post("/public/certifications/linux-home-server/check-answers")
             .then()
             .statusCode(200)
-            .body("results.q-nginx-1", is(true));
+            .body("results.a4de5a5b-3659-4646-b422-1e5e3ff60ba9", is(true));
     }
 
     @Test
     void testCheckAnswersIncorrect() {
-        // Submit an incorrect answer for q-nginx-1 (wrong answer is a-nginx-1-0)
+        // Submit an incorrect answer for q-nginx-1 (question ID: a4de5a5b-3659-4646-b422-1e5e3ff60ba9)
+        // Using wrong answer option ID: 802eea62-db44-4a34-af38-ea3db37d8211 (first option - incorrect)
         given()
             .contentType("application/json")
-            .body(Map.of("answers", Map.of("q-nginx-1", "a-nginx-1-0")))
+            .body(Map.of("answers", Map.of("a4de5a5b-3659-4646-b422-1e5e3ff60ba9", "802eea62-db44-4a34-af38-ea3db37d8211")))
             .when()
             .post("/public/certifications/linux-home-server/check-answers")
             .then()
             .statusCode(200)
-            .body("results.q-nginx-1", is(false));
+            .body("results.a4de5a5b-3659-4646-b422-1e5e3ff60ba9", is(false));
     }
 
     @Test

@@ -35,7 +35,7 @@ docker run -it --rm \
 
 e2e tests will work against this running image. see dev readme for tips on how to run them manually.
 
-Delete test accounts as follows (which cascade deletes other data like federated identities, roles, credentials, authorization codes, etc.):
+Delete test data as follows:
 
 ```
 delete from T_TODO;

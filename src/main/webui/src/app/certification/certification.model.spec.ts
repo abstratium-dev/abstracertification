@@ -172,6 +172,9 @@ describe('CertificationModelService', () => {
       service.setCurrentCertification(definition, 'test-cert');
       service.setMaxReachedEntryIndex(3);
 
+      // Flush effects to ensure the localStorage write happens
+      TestBed.flushEffects();
+
       const stored = localStorage.getItem('wizard-progress-test-cert');
       expect(stored).toBeTruthy();
       expect(JSON.parse(stored!).maxReachedEntryIndex).toBe(3);
@@ -185,6 +188,9 @@ describe('CertificationModelService', () => {
 
       service.setCurrentCertification(definition, 'test-cert');
       service.setChoiceSelections('Choose setup', new Set([0, 2]));
+
+      // Flush effects to ensure the localStorage write happens
+      TestBed.flushEffects();
 
       const stored = localStorage.getItem('wizard-progress-test-cert');
       expect(stored).toBeTruthy();
@@ -257,9 +263,11 @@ describe('CertificationModelService', () => {
 
       service.setCurrentCertification(def1, 'cert-1');
       service.setMaxReachedEntryIndex(3);
+      TestBed.flushEffects();
 
       service.setCurrentCertification(def2, 'cert-2');
       service.setMaxReachedEntryIndex(7);
+      TestBed.flushEffects();
 
       // Reload cert-1
       service.setCurrentCertification(def1, 'cert-1');
