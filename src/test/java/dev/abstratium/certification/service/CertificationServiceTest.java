@@ -173,4 +173,21 @@ class CertificationServiceTest {
             certificationService.copy("non-existent-id", "new-id");
         });
     }
+
+    @Test
+    void testFindComingSoonCertification() {
+        Certification cert = certificationService.findByIdWithDetails("hardening-linux-server");
+        assertNotNull(cert);
+        assertEquals("Hardening a Linux Server", cert.getTitle());
+        assertTrue(cert.getComingSoon(), "Hardening certification should be marked as coming soon");
+        assertFalse(cert.getPageEntries().isEmpty(), "Should have at least an intro page entry");
+        assertFalse(cert.getSteps().isEmpty(), "Should have at least an intro step");
+    }
+
+    @Test
+    void testExistingCertificationNotComingSoon() {
+        Certification cert = certificationService.findById("linux-home-server");
+        assertNotNull(cert);
+        assertFalse(cert.getComingSoon(), "Linux home server certification should not be coming soon");
+    }
 }

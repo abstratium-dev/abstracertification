@@ -31,7 +31,7 @@ class PublicCertificationResourceTest {
 
     @Test
     void testGetAllReturnsSummary() {
-        // List endpoint returns summaries (id, title, description) without nested collections
+        // List endpoint returns summaries ordered by sequence_order
         given()
             .when()
             .get("/public/certifications")
@@ -39,7 +39,11 @@ class PublicCertificationResourceTest {
             .statusCode(200)
             .body("[0].id", is("linux-home-server"))
             .body("[0].title", is("Linux Home Server Setup"))
-            .body("[0].description", notNullValue());
+            .body("[0].description", notNullValue())
+            .body("[0].comingSoon", is(false))
+            .body("[1].id", is("hardening-linux-server"))
+            .body("[1].title", is("Hardening a Linux Server"))
+            .body("[1].comingSoon", is(true));
     }
 
     @Test
@@ -181,5 +185,19 @@ class PublicCertificationResourceTest {
             .post("/public/certifications/linux-home-server/check-answers")
             .then()
             .statusCode(400);
+    }
+
+    @Test
+    void testGetComingSoonCertification() {
+        given()
+            .when()
+            .get("/public/certifications/hardening-linux-server")
+            .then()
+            .statusCode(200)
+            .body("id", is("hardening-linux-server"))
+            .body("title", is("Hardening a Linux Server"))
+            .body("comingSoon", is(true))
+            .body("pageEntries", notNullValue())
+            .body("steps", notNullValue());
     }
 }

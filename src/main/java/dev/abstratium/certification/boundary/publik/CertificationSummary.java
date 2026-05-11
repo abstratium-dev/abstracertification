@@ -4,13 +4,14 @@ import dev.abstratium.certification.entity.Certification;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
-public record CertificationSummary(String id, String title, String description) {
+public record CertificationSummary(String id, String title, String description, boolean comingSoon) {
 
     public static CertificationSummary from(Certification certification) {
         return new CertificationSummary(
                 certification.getId(),
                 certification.getTitle(),
-                certification.getDescription()
+                certification.getDescription(),
+                Boolean.TRUE.equals(certification.getComingSoon())
         );
     }
 }

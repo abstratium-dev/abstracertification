@@ -43,16 +43,16 @@ describe('CertificationModelService', () => {
   describe('Certifications List', () => {
     it('should set certifications', () => {
       const certs: CertificationSummary[] = [
-        { id: 'cert-1', title: 'Cert 1', description: 'Description 1' },
-        { id: 'cert-2', title: 'Cert 2', description: 'Description 2' }
+        { id: 'cert-1', title: 'Cert 1', description: 'Description 1', comingSoon: false },
+        { id: 'cert-2', title: 'Cert 2', description: 'Description 2', comingSoon: true }
       ];
       service.setCertifications(certs);
       expect(service.certifications$()).toEqual(certs);
     });
 
     it('should update certifications', () => {
-      const certs1: CertificationSummary[] = [{ id: '1', title: 'A', description: '' }];
-      const certs2: CertificationSummary[] = [{ id: '2', title: 'B', description: '' }];
+      const certs1: CertificationSummary[] = [{ id: '1', title: 'A', description: '', comingSoon: false }];
+      const certs2: CertificationSummary[] = [{ id: '2', title: 'B', description: '', comingSoon: false }];
 
       service.setCertifications(certs1);
       expect(service.certifications$()).toEqual(certs1);
@@ -62,7 +62,7 @@ describe('CertificationModelService', () => {
     });
 
     it('should handle empty certifications list', () => {
-      service.setCertifications([{ id: '1', title: 'A', description: '' }]);
+      service.setCertifications([{ id: '1', title: 'A', description: '', comingSoon: false }]);
       service.setCertifications([]);
       expect(service.certifications$()).toEqual([]);
     });
@@ -136,8 +136,8 @@ describe('CertificationModelService', () => {
   describe('Service Singleton', () => {
     it('should be a singleton across injections', () => {
       const service2 = TestBed.inject(CertificationModelService);
-      service.setCertifications([{ id: '1', title: 'A', description: '' }]);
-      expect(service2.certifications$()).toEqual([{ id: '1', title: 'A', description: '' }]);
+      service.setCertifications([{ id: '1', title: 'A', description: '', comingSoon: false }]);
+      expect(service2.certifications$()).toEqual([{ id: '1', title: 'A', description: '', comingSoon: false }]);
     });
   });
 

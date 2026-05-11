@@ -4,12 +4,16 @@ import java.security.Principal;
 
 import dev.abstratium.certification.entity.Feedback;
 import dev.abstratium.certification.service.FeedbackService;
+import dev.abstratium.core.IpAddressUtil;
+import dev.abstratium.core.RateLimited;
+import io.vertx.ext.web.RoutingContext;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
@@ -33,7 +37,9 @@ public class FeedbackResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response submitFeedback(FeedbackRequest request, @Context SecurityContext securityContext) {
+    @RateLimited(maxRequests = 5, windowSeconds = 600)
+    public Response submitFeedback(FeedbackRequest request, @Context SecurityContext securityContext,
+            @Context HttpHeaders headers, @Context RoutingContext rc) {
         if (request == null || request.feedbackText == null || request.feedbackText.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ErrorResponse("Feedback text is required"))
@@ -61,11 +67,7 @@ public class FeedbackResource {
             username = principal.getName();
         }
 
-        // Get IP address from X-Forwarded-For header or use remote address
-        String ipAddress = request.ipAddress;
-        if (ipAddress == null || ipAddress.isEmpty()) {
-            ipAddress = "unknown";
-        }
+        String ipAddress = IpAddressUtil.extractIpAddress(headers, rc);
 
         LOG.debugf("Received feedback: type=%s, target=%s, cert=%s, user=%s",
                 request.feedbackType, request.targetId, request.certificationId, username);
@@ -103,7 +105,6 @@ public class FeedbackResource {
         public String targetId;
         public String certificationId;
         public String feedbackText;
-        public String ipAddress;
     }
 
     public static class SuccessResponse {

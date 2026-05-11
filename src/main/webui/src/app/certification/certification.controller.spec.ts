@@ -32,8 +32,8 @@ describe('CertificationController', () => {
   describe('loadCertifications', () => {
     it('should load certifications and update model service', () => {
       const mockCerts = [
-        { id: 'cert-1', title: 'Cert 1', description: 'Desc 1' },
-        { id: 'cert-2', title: 'Cert 2', description: 'Desc 2' }
+        { id: 'cert-1', title: 'Cert 1', description: 'Desc 1', comingSoon: false },
+        { id: 'cert-2', title: 'Cert 2', description: 'Desc 2', comingSoon: true }
       ];
 
       controller.loadCertifications();

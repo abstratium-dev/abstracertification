@@ -1,12 +1,23 @@
 import { Routes } from '@angular/router';
 import { NotFoundComponent } from './core/not-found/not-found.component';
 import { SignedOutComponent } from './core/signed-out/signed-out.component';
-import { CertificationListComponent } from './certification/certification-list.component';
+import { WelcomeComponent } from './core/welcome/welcome.component';
 import { authGuard } from './core/auth.guard';
 
 export const routes: Routes = [
-  { path: '',                               component: CertificationListComponent },
-  { path: 'certifications',               component: CertificationListComponent },
+  { path: '',                             component: WelcomeComponent },
+  {
+    path: 'pricing',
+    loadComponent: () => import('./core/pricing/pricing.component').then(m => m.PricingComponent)
+  },
+  {
+    path: 'contact',
+    loadComponent: () => import('./core/contact/contact.component').then(m => m.ContactComponent)
+  },
+  {
+    path: 'certifications',
+    loadComponent: () => import('./certification/certification-list.component').then(m => m.CertificationListComponent)
+  },
   {
     path: 'certification/:certificationId',
     loadComponent: () => import('./certification/certification-wizard.component').then(m => m.CertificationWizardComponent)

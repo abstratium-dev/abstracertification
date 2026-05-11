@@ -65,6 +65,25 @@
     }
 }
 
+#home-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-link-primary);
+    transition: color 0.2s ease;
+
+    svg {
+        display: block;
+    }
+
+    &:hover {
+        color: var(--color-link-hover);
+    }
+
+    &.inactive-link {
+        color: var(--color-text-primary);
+    }
+}
+
 .theme-toggle-btn {
     padding: 0.5rem;
     background: transparent;

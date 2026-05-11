@@ -1,0 +1,131 @@
+<div class="contact-page">
+  <div class="contact-back">
+    <button type="button" class="btn-secondary" (click)="goBack()">&#8592; Back</button>
+  </div>
+
+  <section class="contact-hero">
+    <h1 class="contact-title">Contact Us</h1>
+    <p class="contact-subtitle">
+      Have a question or want to find out more? We would love to hear from you.
+    </p>
+  </section>
+
+  <section class="contact-content">
+    @if (submitted()) {
+      <div class="message message-success">
+        <svg class="message-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 12 L11 15 L16 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <strong>Thank you!</strong> Your message has been received. We will be in touch shortly.
+        </div>
+      </div>
+    } @else {
+      @if (error()) {
+        <div class="message message-error">
+          <svg class="message-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="16" r="1" fill="currentColor"/>
+          </svg>
+          <div>{{ error() }}</div>
+        </div>
+      }
+
+      <div class="card contact-card">
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="form-group">
+            <label for="name" class="form-label">Full Name <span class="required">*</span></label>
+            <input
+              id="name"
+              type="text"
+              class="form-control"
+              [class.form-control-error]="isInvalid('name')"
+              formControlName="name"
+              placeholder="Your full name"
+              autocomplete="name"
+            />
+            @if (isInvalid('name')) {
+              <span class="field-error">
+                @if (form.get('name')?.errors?.['required']) { Name is required. }
+                @else if (form.get('name')?.errors?.['maxlength']) { Name must not exceed 255 characters. }
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="country" class="form-label">Country <span class="required">*</span></label>
+            <input
+              id="country"
+              type="text"
+              class="form-control"
+              [class.form-control-error]="isInvalid('country')"
+              formControlName="country"
+              placeholder="Your country"
+              autocomplete="country-name"
+            />
+            @if (isInvalid('country')) {
+              <span class="field-error">
+                @if (form.get('country')?.errors?.['required']) { Country is required. }
+                @else if (form.get('country')?.errors?.['maxlength']) { Country must not exceed 100 characters. }
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address <span class="required">*</span></label>
+            <input
+              id="email"
+              type="email"
+              class="form-control"
+              [class.form-control-error]="isInvalid('email')"
+              formControlName="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+            />
+            @if (isInvalid('email')) {
+              <span class="field-error">
+                @if (form.get('email')?.errors?.['required']) { Email address is required. }
+                @else if (form.get('email')?.errors?.['email']) { Please enter a valid email address. }
+                @else if (form.get('email')?.errors?.['maxlength']) { Email must not exceed 255 characters. }
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="query" class="form-label">Your Query <span class="required">*</span></label>
+            <textarea
+              id="query"
+              class="form-control form-textarea"
+              [class.form-control-error]="isInvalid('query')"
+              formControlName="query"
+              placeholder="Tell us how we can help..."
+              rows="6"
+            ></textarea>
+            @if (isInvalid('query')) {
+              <span class="field-error">
+                @if (form.get('query')?.errors?.['required']) { Query is required. }
+                @else if (form.get('query')?.errors?.['maxlength']) { Query must not exceed 5000 characters. }
+              </span>
+            }
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn-primary"
+              [disabled]="submitting()"
+            >
+              @if (submitting()) {
+                Sending...
+              } @else {
+                Send Message
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  </section>
+</div>

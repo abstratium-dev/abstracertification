@@ -5,13 +5,15 @@
   </div>
 
   <div class="certifications-grid" *ngIf="!loading() && !error() && certifications().length > 0">
-    <div *ngFor="let cert of certifications()" class="certification-card">
-      <div class="certification-icon">&#127942;</div>
+    <div *ngFor="let cert of certifications()" class="certification-card" [class.coming-soon]="cert.comingSoon">
+      <div class="certification-card-header">
+        <span *ngIf="cert.comingSoon" class="coming-soon-badge">Coming Soon</span>
+      </div>
       <h2 class="certification-title">{{ cert.title }}</h2>
       <p class="certification-description">{{ cert.description }}</p>
       <div class="certification-meta">
         <button class="btn-secondary btn-overview" (click)="viewOverview(cert.id); $event.stopPropagation()">Overview</button>
-        <button class="btn-primary btn-start" (click)="startCertification(cert.id)">Start</button>
+        <button *ngIf="!cert.comingSoon" class="btn-primary btn-start" (click)="startCertification(cert.id)">Start</button>
       </div>
     </div>
   </div>

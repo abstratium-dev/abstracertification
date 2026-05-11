@@ -1,6 +1,6 @@
 # abstracertification
 
-**abstracertification** is a site containing certifications which engineers can achieve on their way to learning about how abstratium develops and deploys software.
+**abstracertification** is a site containing certifications that engineers can achieve on their way to learning about how abstratium develops and deploys software.
 
 ⚠️ **IMPORTANT**: Avoid modifying the `/core` directory in your project forks. Keep your custom logic in `/app` or specific feature packages to minimize merge conflicts during updates.
 

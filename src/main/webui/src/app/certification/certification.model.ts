@@ -7,6 +7,7 @@ export interface CertificationSummary {
   id: string;
   title: string;
   description: string;
+  comingSoon: boolean;
 }
 
 /**

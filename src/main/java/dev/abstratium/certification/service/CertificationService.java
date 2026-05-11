@@ -23,7 +23,7 @@ public class CertificationService {
 
     @Transactional
     public List<Certification> findAll() {
-        return em.createQuery("SELECT c FROM Certification c ORDER BY c.title", Certification.class)
+        return em.createQuery("SELECT c FROM Certification c ORDER BY c.sequenceOrder", Certification.class)
                 .getResultList();
     }
 
@@ -101,6 +101,8 @@ public class CertificationService {
         copy.setId(newId);
         copy.setTitle(source.getTitle() + " (Copy)");
         copy.setDescription(source.getDescription());
+        copy.setComingSoon(source.getComingSoon());
+        copy.setSequenceOrder(source.getSequenceOrder());
 
         for (CertificationStep sourceStep : source.getSteps()) {
             CertificationStep stepCopy = copyStep(sourceStep, copy);

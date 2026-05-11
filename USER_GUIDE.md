@@ -85,6 +85,13 @@ _Replace all `TODO_...` values with the values generated above.
      -e ABSTRATIUM_CLIENT_ID="abstratium-abstracertification" \
      -e ABSTRATIUM_CLIENT_SECRET="YOUR_OIDC_CLIENT_SECRET" \
      -e ANTHROPIC_API_KEY="YOUR_ANTHROPIC_API_KEY" \
+     -e MAIL_HOST="YOUR_SMTP_HOST" \
+     -e MAIL_PORT="587" \
+     -e MAIL_TLS="true" \
+     -e MAIL_USERNAME="YOUR_SMTP_USERNAME" \
+     -e MAIL_PASSWORD="YOUR_SMTP_PASSWORD" \
+     -e MAIL_FROM="noreply@yourdomain.com" \
+     -e CONTACT_MAIL_TO="contact@yourdomain.com" \
      ghcr.io/abstratium-dev/abstracertification:latest
    ```
 
@@ -96,6 +103,13 @@ _Replace all `TODO_...` values with the values generated above.
    - `CSRF_TOKEN_SIGNATURE_KEY`: CSRF token signature key (min 32 chars, generate with `openssl rand -base64 64 | tr -d '\n'`)
    - `ABSTRATIUM_CLIENT_SECRET`: OAuth2 client secret from authentication server
    - `ANTHROPIC_API_KEY`: Anthropic Claude API key for AI chat functionality (get from https://console.anthropic.com/)
+   - `MAIL_HOST`: SMTP server hostname (e.g. `smtp.sendgrid.net`)
+   - `MAIL_PORT`: SMTP server port (default: `587`)
+   - `MAIL_TLS`: Enable TLS for SMTP connection (`true` or `false`, default: `true`)
+   - `MAIL_USERNAME`: SMTP authentication username
+   - `MAIL_PASSWORD`: SMTP authentication password
+   - `MAIL_FROM`: Sender email address for outgoing notifications (default: `noreply@abstratium.dev`)
+   - `CONTACT_MAIL_TO`: Recipient email address for contact form submissions (default: `contact@abstratium.dev`)
    
    **Optional Environment Variables:**
    - `DEPLOYMENT_ENV`: Deployment environment name (default: `dev`)

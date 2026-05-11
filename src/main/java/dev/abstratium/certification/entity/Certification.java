@@ -43,6 +43,12 @@ public class Certification {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "coming_soon", nullable = false)
+    private Boolean comingSoon = false;
+
+    @Column(name = "sequence_order", nullable = false)
+    private Integer sequenceOrder = 0;
+
     @OneToMany(mappedBy = "certification", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CertificationStep> steps = new ArrayList<>();
 
@@ -98,6 +104,22 @@ public class Certification {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Boolean getComingSoon() {
+        return comingSoon;
+    }
+
+    public void setComingSoon(Boolean comingSoon) {
+        this.comingSoon = comingSoon;
+    }
+
+    public Integer getSequenceOrder() {
+        return sequenceOrder;
+    }
+
+    public void setSequenceOrder(Integer sequenceOrder) {
+        this.sequenceOrder = sequenceOrder;
     }
 
     public List<CertificationStep> getSteps() {
