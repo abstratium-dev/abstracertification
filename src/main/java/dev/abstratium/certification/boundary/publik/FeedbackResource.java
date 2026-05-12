@@ -1,4 +1,4 @@
-package dev.abstratium.core.boundary.publik;
+package dev.abstratium.certification.boundary.publik;
 
 import java.security.Principal;
 
@@ -6,6 +6,7 @@ import dev.abstratium.certification.entity.Feedback;
 import dev.abstratium.certification.service.FeedbackService;
 import dev.abstratium.core.IpAddressUtil;
 import dev.abstratium.core.RateLimited;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -100,6 +101,7 @@ public class FeedbackResource {
         }
     }
 
+    @RegisterForReflection
     public static class FeedbackRequest {
         public String feedbackType;
         public String targetId;
@@ -107,6 +109,7 @@ public class FeedbackResource {
         public String feedbackText;
     }
 
+    @RegisterForReflection
     public static class SuccessResponse {
         public String id;
         public String message;
@@ -117,6 +120,7 @@ public class FeedbackResource {
         }
     }
 
+    @RegisterForReflection
     public static class ErrorResponse {
         public String error;
 

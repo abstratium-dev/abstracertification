@@ -4,6 +4,7 @@ import dev.abstratium.certification.entity.Contact;
 import dev.abstratium.certification.service.ContactService;
 import dev.abstratium.core.IpAddressUtil;
 import dev.abstratium.core.RateLimited;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -51,5 +52,6 @@ public class ContactResource {
                 .build();
     }
 
+    @RegisterForReflection
     public record ContactResponse(String id) {}
 }

@@ -2,6 +2,9 @@ package dev.abstratium.certification.boundary.publik;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class ChatMessage {
     
     @JsonProperty(required = true)

@@ -1,4 +1,4 @@
-package dev.abstratium.core.boundary.publik;
+package dev.abstratium.certification.boundary.publik;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
