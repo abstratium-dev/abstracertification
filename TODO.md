@@ -10,6 +10,8 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 ## Today
 
 
+- banner to show environment, based on new env var - how is that solved in abstrauth, as i want that in abstracore!
+- use that env for the emails, not the profile, as t env isn't test, but it is prod!
 - make fonts friendlier
 - simplify the overviews, they're too long
 - stripe integration
@@ -18,6 +20,8 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 - allow signing up in prod
 - fix bug that refresh ruins the url that was in the browser and returns the user to the home page
 - add other necessary microservices
+- allow me to sign in
+  - if admin then allow to view feedback and contact and enable/disable certifications
 
 - since users can sign up and pay at the end, we need a way to verify that they really did complete all the questions. localstorage should store an encrypted token for each page that was successfully completed, based on a unique ID that is generated for localstorage and supplied when checking the answers. that way the user cannot hack localstorage. the server verifies all of those tokens when the account is opened and stores the information in the users account
 
@@ -66,6 +70,7 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
   - SSL with certbot from letsencrypt
     - including how to make it so that they are auto updated
   - certification on setting up and deploying abstrauth
+  - setting up a secure samba server for file sharing
 
 
 - [ ] - Update SECURITY_DESIGN.md with project-specific information

@@ -51,6 +51,11 @@ export class CertificationModelService {
    */
   private currentCertificationId = signal<string>('');
 
+  /**
+   * Tracks the previous certification ID to detect when switching between certifications.
+   */
+  private previousCertificationId = '';
+
   certifications$: Signal<CertificationSummary[]> = this.certifications.asReadonly();
   certificationsLoading$: Signal<boolean> = this.certificationsLoading.asReadonly();
   certificationsError$: Signal<string | null> = this.certificationsError.asReadonly();
@@ -95,6 +100,8 @@ export class CertificationModelService {
   setCurrentCertification(certification: WizardDefinition | null, certificationId?: string) {
     this.currentCertification.set(certification);
     if (certificationId) {
+      // Track previous ID before updating
+      this.previousCertificationId = this.currentCertificationId();
       this.currentCertificationId.set(certificationId);
       this.loadProgress(certificationId);
     }
@@ -102,19 +109,33 @@ export class CertificationModelService {
 
   /**
    * Loads saved progress from localStorage for the given certification.
-   * Only updates maxReachedEntryIndex if the stored value is higher than current.
+   * When switching certifications, loads the saved value for that certification.
+   * When reloading the same certification, only increases maxReachedEntryIndex (never decreases).
    */
   private loadProgress(certificationId: string): void {
     const progress = this.progressService.loadProgress(certificationId);
+    // Check if we're switching to a different certification
+    const isSwitchingCertification = this.previousCertificationId !== '' &&
+                                     this.previousCertificationId !== certificationId;
+
     if (progress) {
-      // Never decrease maxReachedEntryIndex - only increase if stored value is higher
-      const currentMax = this.maxReachedEntryIndex();
-      if (progress.maxReachedEntryIndex > currentMax) {
+      // When switching certifications: load the saved value for that certification
+      // When same certification: never decrease, only increase if stored is higher
+      if (isSwitchingCertification) {
         this.maxReachedEntryIndex.set(progress.maxReachedEntryIndex);
+      } else {
+        const currentMax = this.maxReachedEntryIndex();
+        if (progress.maxReachedEntryIndex > currentMax) {
+          this.maxReachedEntryIndex.set(progress.maxReachedEntryIndex);
+        }
       }
       this.choiceSelections.set(this.deserializeChoiceSelections(progress.choiceSelections));
+    } else if (isSwitchingCertification) {
+      // Reset to 0 when switching to a certification with no saved progress
+      this.maxReachedEntryIndex.set(0);
+      this.choiceSelections.set(new Map());
     }
-    // If no progress found, keep current value (don't reset to 0)
+    // For same certification with no progress: keep current value
   }
 
   /**
