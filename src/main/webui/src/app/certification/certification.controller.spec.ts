@@ -47,6 +47,22 @@ describe('CertificationController', () => {
       expect(modelService.certificationsError$()).toBeNull();
     });
 
+    it('should sort coming-soon certifications after ready ones regardless of API order', () => {
+      const mockCerts = [
+        { id: 'cert-coming', title: 'Coming Soon Cert', description: 'Not yet', comingSoon: true },
+        { id: 'cert-ready',  title: 'Ready Cert',       description: 'Available', comingSoon: false }
+      ];
+
+      controller.loadCertifications();
+
+      const req = httpMock.expectOne('/public/certifications');
+      req.flush(mockCerts);
+
+      const result = modelService.certifications$();
+      expect(result[0].comingSoon).toBe(false);
+      expect(result[1].comingSoon).toBe(true);
+    });
+
     it('should set loading state before request', () => {
       controller.loadCertifications();
 

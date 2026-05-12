@@ -51,7 +51,7 @@ public class CertificationStep {
     private String why;
 
     @Column(name = "info_expanded", nullable = false)
-    private Boolean infoExpanded = false;
+    private Boolean infoExpanded = true;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

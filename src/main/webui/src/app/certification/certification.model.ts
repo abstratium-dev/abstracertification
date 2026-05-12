@@ -102,16 +102,19 @@ export class CertificationModelService {
 
   /**
    * Loads saved progress from localStorage for the given certification.
+   * Only updates maxReachedEntryIndex if the stored value is higher than current.
    */
   private loadProgress(certificationId: string): void {
     const progress = this.progressService.loadProgress(certificationId);
     if (progress) {
-      this.maxReachedEntryIndex.set(progress.maxReachedEntryIndex);
+      // Never decrease maxReachedEntryIndex - only increase if stored value is higher
+      const currentMax = this.maxReachedEntryIndex();
+      if (progress.maxReachedEntryIndex > currentMax) {
+        this.maxReachedEntryIndex.set(progress.maxReachedEntryIndex);
+      }
       this.choiceSelections.set(this.deserializeChoiceSelections(progress.choiceSelections));
-    } else {
-      this.maxReachedEntryIndex.set(0);
-      this.choiceSelections.set(new Map());
     }
+    // If no progress found, keep current value (don't reset to 0)
   }
 
   /**

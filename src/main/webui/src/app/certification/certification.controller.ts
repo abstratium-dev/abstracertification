@@ -117,7 +117,8 @@ export class CertificationController {
 
     this.http.get<CertificationSummary[]>(this.publicApiUrl).subscribe({
       next: (certifications) => {
-        this.modelService.setCertifications(certifications);
+        const sorted = [...certifications].sort((a, b) => Number(a.comingSoon) - Number(b.comingSoon));
+        this.modelService.setCertifications(sorted);
         this.modelService.setCertificationsLoading(false);
       },
       error: (err) => {

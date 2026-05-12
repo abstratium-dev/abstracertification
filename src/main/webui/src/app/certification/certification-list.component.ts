@@ -3,6 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CertificationModelService } from './certification.model';
 import { CertificationController } from './certification.controller';
+import { WizardProgressService } from '../core/wizard/wizard-progress.service';
 
 /**
  * Displays a grid of available certifications loaded from the public API.
@@ -19,6 +20,7 @@ export class CertificationListComponent implements OnInit {
   private modelService = inject(CertificationModelService);
   private controller = inject(CertificationController);
   private router = inject(Router);
+  private progressService = inject(WizardProgressService);
 
   certifications = this.modelService.certifications$;
   loading = this.modelService.certificationsLoading$;
@@ -26,6 +28,10 @@ export class CertificationListComponent implements OnInit {
 
   ngOnInit(): void {
     this.controller.loadCertifications();
+  }
+
+  hasStarted(certificationId: string): boolean {
+    return this.progressService.hasProgress(certificationId);
   }
 
   startCertification(certificationId: string): void {

@@ -15,6 +15,10 @@ export const routes: Routes = [
     loadComponent: () => import('./core/contact/contact.component').then(m => m.ContactComponent)
   },
   {
+    path: 'legal',
+    loadComponent: () => import('./core/legal/legal.component').then(m => m.LegalComponent)
+  },
+  {
     path: 'certifications',
     loadComponent: () => import('./certification/certification-list.component').then(m => m.CertificationListComponent)
   },

@@ -6,9 +6,12 @@ import java.util.List;
 
 import dev.abstratium.certification.entity.Certification;
 import dev.abstratium.certification.entity.Feedback;
+import io.quarkus.mailer.MockMailbox;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+
+import org.junit.jupiter.api.BeforeEach;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +23,14 @@ class FeedbackServiceTest {
 
     @Inject
     CertificationService certificationService;
+
+    @Inject
+    MockMailbox mailbox;
+
+    @BeforeEach
+    void clearMailbox() {
+        mailbox.clear();
+    }
 
     @Test
     void testCreateFeedback() {
@@ -222,6 +233,33 @@ class FeedbackServiceTest {
     void testDeleteNonExistentDoesNotThrow() {
         // Should not throw
         assertDoesNotThrow(() -> feedbackService.delete("non-existent-id"));
+    }
+
+    @Test
+    void testCreateFeedbackSendsEmail() {
+        Feedback feedback = feedbackService.createFeedback(
+                "INSTRUCTION",
+                "test-email-instruction",
+                "linux-home-server",
+                "This instruction needs more detail",
+                "192.168.0.1",
+                "emailtestuser"
+        );
+
+        var sent = mailbox.getMailsSentTo("test@example.com");
+        assertEquals(1, sent.size(), "One notification email should have been sent");
+        String subject = sent.get(0).getSubject();
+        String body = sent.get(0).getText();
+        assertTrue(subject.contains("INSTRUCTION"), "Subject should contain feedback type");
+        assertTrue(body.contains(feedback.getId()), "Body should contain feedback ID");
+        assertTrue(body.contains("test-email-instruction"), "Body should contain target ID");
+        assertTrue(body.contains("This instruction needs more detail"), "Body should contain feedback text");
+        assertTrue(body.contains("emailtestuser"), "Body should contain username");
+        assertTrue(body.contains("192.168.0.1"), "Body should contain IP address");
+        assertTrue(body.contains("Submitted:"), "Body should contain submission timestamp");
+
+        // Cleanup
+        feedbackService.delete(feedback.getId());
     }
 
     @Test
