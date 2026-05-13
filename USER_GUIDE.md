@@ -110,9 +110,12 @@ _Replace all `TODO_...` values with the values generated above.
    - `MAIL_PASSWORD`: SMTP authentication password
    - `MAIL_FROM`: Sender email address for outgoing notifications (default: `noreply@abstratium.dev`)
    - `CONTACT_MAIL_TO`: Recipient email address for contact form submissions (default: `contact@abstratium.dev`)
+   - `ABSTRA_WARNING_MESSAGE`: Warning banner message displayed at the top of the UI (e.g., "You are in the TEST environment!"). Set to "-" or leave empty to hide the banner.
+   - `STAGE`: Deployment stage identifier exposed to the frontend (e.g., "dev", "test", "prod", defaults to "dev")
    
    **Optional Environment Variables:**
    - `DEPLOYMENT_ENV`: Deployment environment name (default: `dev`)
+
 
 3. **Verify the container is running**:
    ```bash

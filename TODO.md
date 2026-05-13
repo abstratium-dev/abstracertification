@@ -9,6 +9,7 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
+- integrate toggles
 
 - banner to show environment, based on new env var - how is that solved in abstrauth, as i want that in abstracore!
 - use that env for the emails, not the profile, as t env isn't test, but it is prod!
