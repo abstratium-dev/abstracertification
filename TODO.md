@@ -11,6 +11,7 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 - integrate toggles
 
+- put feedback into certifications
 - banner to show environment, based on new env var - how is that solved in abstrauth, as i want that in abstracore!
 - use that env for the emails, not the profile, as t env isn't test, but it is prod!
 - make fonts friendlier
@@ -23,6 +24,8 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 - add other necessary microservices
 - allow me to sign in
   - if admin then allow to view feedback and contact and enable/disable certifications
+
+- add links to test and prod to README so that it is linked by search engines
 
 - since users can sign up and pay at the end, we need a way to verify that they really did complete all the questions. localstorage should store an encrypted token for each page that was successfully completed, based on a unique ID that is generated for localstorage and supplied when checking the answers. that way the user cannot hack localstorage. the server verifies all of those tokens when the account is opened and stores the information in the users account
 
