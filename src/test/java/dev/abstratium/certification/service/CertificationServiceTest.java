@@ -176,10 +176,10 @@ class CertificationServiceTest {
 
     @Test
     void testFindComingSoonCertification() {
-        Certification cert = certificationService.findByIdWithDetails("hardening-linux-server");
+        Certification cert = certificationService.findByIdWithDetails("ssl-certbot-letsencrypt");
         assertNotNull(cert);
-        assertEquals("Hardening a Linux Server", cert.getTitle());
-        assertTrue(cert.getComingSoon(), "Hardening certification should be marked as coming soon");
+        assertEquals("SSL with Certbot from Let's Encrypt", cert.getTitle());
+        assertTrue(cert.getComingSoon(), "SSL Certbot certification should be marked as coming soon");
         assertFalse(cert.getPageEntries().isEmpty(), "Should have at least an intro page entry");
         assertFalse(cert.getSteps().isEmpty(), "Should have at least an intro step");
     }

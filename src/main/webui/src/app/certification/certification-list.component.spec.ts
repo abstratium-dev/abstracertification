@@ -67,9 +67,9 @@ describe('CertificationListComponent', () => {
 
   describe('template rendering', () => {
     const mockCerts = [
-      { id: 'cert-1', title: 'Cert One', description: 'Desc one', comingSoon: false },
-      { id: 'cert-2', title: 'Cert Two', description: 'Desc two', comingSoon: false },
-      { id: 'cert-3', title: 'Cert Three', description: 'Desc three', comingSoon: true },
+      { id: 'cert-1', title: 'Cert One', description: 'Desc one', comingSoon: false, aiEnabled: false },
+      { id: 'cert-2', title: 'Cert Two', description: 'Desc two', comingSoon: false, aiEnabled: false },
+      { id: 'cert-3', title: 'Cert Three', description: 'Desc three', comingSoon: true, aiEnabled: false },
     ];
 
     beforeEach(() => {

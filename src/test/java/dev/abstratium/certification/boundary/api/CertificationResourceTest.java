@@ -158,6 +158,6 @@ class CertificationResourceTest {
             .when()
             .post("/api/certifications/non-existent/copy")
             .then()
-            .statusCode(500); // Internal server error due to IllegalArgumentException
+            .statusCode(400); // Bad request due to IllegalArgumentException
     }
 }

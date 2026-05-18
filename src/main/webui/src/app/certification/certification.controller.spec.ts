@@ -32,8 +32,8 @@ describe('CertificationController', () => {
   describe('loadCertifications', () => {
     it('should load certifications and update model service', () => {
       const mockCerts = [
-        { id: 'cert-1', title: 'Cert 1', description: 'Desc 1', comingSoon: false },
-        { id: 'cert-2', title: 'Cert 2', description: 'Desc 2', comingSoon: true }
+        { id: 'cert-1', title: 'Cert 1', description: 'Desc 1', comingSoon: false, aiEnabled: false },
+        { id: 'cert-2', title: 'Cert 2', description: 'Desc 2', comingSoon: true, aiEnabled: false }
       ];
 
       controller.loadCertifications();
@@ -49,8 +49,8 @@ describe('CertificationController', () => {
 
     it('should sort coming-soon certifications after ready ones regardless of API order', () => {
       const mockCerts = [
-        { id: 'cert-coming', title: 'Coming Soon Cert', description: 'Not yet', comingSoon: true },
-        { id: 'cert-ready',  title: 'Ready Cert',       description: 'Available', comingSoon: false }
+        { id: 'cert-coming', title: 'Coming Soon Cert', description: 'Not yet', comingSoon: true, aiEnabled: false },
+        { id: 'cert-ready',  title: 'Ready Cert',       description: 'Available', comingSoon: false, aiEnabled: false }
       ];
 
       controller.loadCertifications();

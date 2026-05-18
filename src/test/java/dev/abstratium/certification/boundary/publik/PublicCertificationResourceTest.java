@@ -43,7 +43,7 @@ class PublicCertificationResourceTest {
             .body("[0].comingSoon", is(false))
             .body("[1].id", is("hardening-linux-server"))
             .body("[1].title", is("Hardening a Linux Server"))
-            .body("[1].comingSoon", is(true));
+            .body("[1].comingSoon", is(false));
     }
 
     @Test
@@ -193,11 +193,11 @@ class PublicCertificationResourceTest {
     void testGetComingSoonCertification() {
         given()
             .when()
-            .get("/public/certifications/hardening-linux-server")
+            .get("/public/certifications/ssl-certbot-letsencrypt")
             .then()
             .statusCode(200)
-            .body("id", is("hardening-linux-server"))
-            .body("title", is("Hardening a Linux Server"))
+            .body("id", is("ssl-certbot-letsencrypt"))
+            .body("title", is("SSL with Certbot from Let's Encrypt"))
             .body("comingSoon", is(true))
             .body("pageEntries", notNullValue())
             .body("steps", notNullValue());

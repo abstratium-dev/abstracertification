@@ -9,6 +9,10 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
+- show message that this is a test env and that no certs can actually be purchased
+
+- fix that refresh loses page history
+
 - integrate toggles - update abstracore to provide caching and interpretation. it should use the id token to build a map and that map can be used. it can add ip address to that too so that later it could base the decision on geolocation.
 
 - put Maxs feedback into certifications
