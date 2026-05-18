@@ -9,17 +9,15 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
-- integrate toggles
-
-- put feedback into certifications
-- banner to show environment, based on new env var - how is that solved in abstrauth, as i want that in abstracore!
-- use that env for the emails, not the profile, as t env isn't test, but it is prod!
+- integrate toggles - update abstracore to provide caching and interpretation. it should use the id token to build a map and that map can be used. it can add ip address to that too so that later it could base the decision on geolocation. 
+- put Maxs feedback into certifications
 - make fonts friendlier
 - simplify the overviews, they're too long
 - stripe integration
 - create pdf for downloading
 - badges
-- allow signing up in prod
+- allow signing up in prod, but requires default roles - is that something we already implemented?
+- abstrauth should do service token expiry, that is only half built
 - fix bug that refresh ruins the url that was in the browser and returns the user to the home page
 - add other necessary microservices
 - allow me to sign in

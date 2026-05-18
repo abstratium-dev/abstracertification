@@ -1,15 +1,16 @@
 package dev.abstratium.certification.service;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
+
 import dev.abstratium.certification.entity.Contact;
+import dev.abstratium.core.service.StageService;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
-import io.quarkus.runtime.LaunchMode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class ContactService {
@@ -26,7 +27,7 @@ public class ContactService {
     String contactMailTo;
 
     @Inject
-    LaunchMode mode;
+    StageService stageService;
 
     @Transactional
     public Contact submit(Contact contact) {
@@ -42,7 +43,7 @@ public class ContactService {
 
     private void sendNotificationEmail(Contact contact) {
         try {
-            String subject = "[" + mode.getDefaultProfile() + "] Abstratium Certification - New Contact Form Submission from " + contact.getName();
+            String subject = "[" + stageService.getStage() + "] Abstratium Certification - New Contact Form Submission from " + contact.getName();
             String body = "ID:        " + contact.getId() + "\n"
                     + "Submitted: " + contact.getCreatedAt() + "\n"
                     + "IP:        " + (contact.getIpAddress() != null ? contact.getIpAddress() : "unknown") + "\n"

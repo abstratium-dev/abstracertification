@@ -6,13 +6,13 @@ import dev.abstratium.certification.entity.Certification;
 import dev.abstratium.certification.entity.Feedback;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
-import io.quarkus.runtime.LaunchMode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
+import dev.abstratium.core.service.StageService;
 
 @ApplicationScoped
 public class FeedbackService {
@@ -29,7 +29,7 @@ public class FeedbackService {
     String contactMailTo;
 
     @Inject
-    LaunchMode mode;
+    StageService stageService;
 
     @Transactional
     public Feedback create(Feedback feedback) {
@@ -99,7 +99,7 @@ public class FeedbackService {
     private void sendNotificationEmail(Feedback feedback) {
         try {
             String certTitle = feedback.getCertification() != null ? feedback.getCertification().getTitle() : "unknown";
-            String subject = "[" + mode.getDefaultProfile() + "] Abstratium Certification - New Feedback Submission (" + feedback.getFeedbackType() + ")";
+            String subject = "[" + stageService.getStage() + "] Abstratium Certification - New Feedback Submission (" + feedback.getFeedbackType() + ")";
             String body = "ID:          " + feedback.getId() + "\n"
                     + "Submitted:   " + feedback.getCreatedAt() + "\n"
                     + "IP:          " + (feedback.getIpAddress() != null ? feedback.getIpAddress() : "unknown") + "\n"
