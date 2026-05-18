@@ -9,6 +9,14 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
+- reduce claude costs. it says:
+
+    You're not using prompt caching
+
+    Add a cache_control block to your requests to reuse expensive context. Most orgs see input costs drop 50–90%.
+
+    see   https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+
 - show message that this is a test env and that no certs can actually be purchased
 
 - fix that refresh loses page history
