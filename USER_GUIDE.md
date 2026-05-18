@@ -1,11 +1,42 @@
 # User Manual
 
+## Using abstracore
+
+TODO write detailed instructions on how your application works
+
+
+### Overview
+#### Key Features
+
+##### Optional AI Assistance
+
+- **Context-Aware Assistance**: The AI assistant has access to the current certification content, including instructions, key concepts, and learning objectives
+- **Smart Constraints**: The assistant is configured to not directly answer assessment questions, but can provide hints and explanations
+- **Streaming Responses**: Chat responses are streamed in real-time for better user experience
+- **Session Management**: Chat sessions are managed client-side with UUID-based session identifiers
+
+#### Core concepts
+#### Typical workflow
+
+---
+
 ## Installation
 
 It is intended that this component be run using docker.
 It supports MySql and will soon also support postgresql and MS SQL Server.
 
 You need to add a database/schema and a user to the database manually.
+
+### Prerequisites
+
+Before installation, ensure you have:
+
+- **Docker** installed and running
+- **MySQL 8.0+** database server
+- **Network connectivity** between Docker container and MySQL
+- **OpenSSL** for generating JWT keys
+- **GitHub account** (if pulling from GitHub Container Registry)
+- **nginx** or similar for reverse proxying and terminating TLS
 
 ### Create the Database, User and Grant Permissions
 
@@ -129,72 +160,6 @@ _Replace all `TODO_...` values with the values generated above.
    - Main application: http://localhost:41085
    - Management interface: http://localhost:9007/m/info
 
-### Prerequisites
-
-Before installation, ensure you have:
-
-- **Docker** installed and running
-- **MySQL 8.0+** database server
-- **Network connectivity** between Docker container and MySQL
-- **OpenSSL** for generating JWT keys
-- **GitHub account** (if pulling from GitHub Container Registry)
-- **nginx** or similar for reverse proxying and terminating TLS
-
-## Initial Onboarding
-
-TODO
-
-## Account and Role Management
-
-This component requires that users can authenticate using an oauth authorization server. That requires that an administrator signs into something like `abstratium-abstrauth` first, to create the oauth2 client. The callback url should be `http://localhost:8085/oauth/callback` and one for the production environment, also ending in `/oauth/callback`. Use the `client_id` and `client_secret` that it provides, to set the values of the environment variables above, so that users can sign in.
-
-## AI Chat Functionality
-
-This application includes an AI-powered chat assistant that uses Anthropic's Claude API to help users with certification content.
-
-### Features
-
-- **Context-Aware Assistance**: The AI assistant has access to the current certification content, including instructions, key concepts, and learning objectives
-- **Smart Constraints**: The assistant is configured to not directly answer assessment questions, but can provide hints and explanations
-- **Streaming Responses**: Chat responses are streamed in real-time for better user experience
-- **Session Management**: Chat sessions are managed client-side with UUID-based session identifiers
-
-### Usage
-
-1. **Chat Interface**: A chat window is available above the question/answer section on each certification page
-2. **Session Persistence**: Chat history is stored client-side and sent with each new message to maintain context
-3. **API Endpoint**: The chat functionality is available at `/public/certifications/{id}/chat`
-
-### API Usage
-
-```bash
-curl -X POST http://localhost:41085/public/certifications/{certification-id}/chat \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "Can you explain this concept better?",
-    "certificationId": "linux-home-server",
-    "pageId": "step-1",
-    "sessionId": "uuid-v4-generated-by-client",
-    "history": [
-      {"role": "user", "content": "Previous question"},
-      {"role": "assistant", "content": "Previous answer"}
-    ]
-  }'
-```
-
-### Configuration
-
-The AI chat functionality requires:
-
-- `ANTHROPIC_API_KEY`: Your Anthropic Claude API key
-- The chat uses Claude 3.5 Sonnet model by default
-- Responses are configured with 0.7 temperature for balanced creativity
-- Maximum token limit is set to 4000 tokens per response
-
-## TODO
-
-TODO describe other functionality here.
-
 ## Monitoring and Health Checks
 
 This project provides several endpoints for monitoring:
@@ -242,7 +207,42 @@ This project provides several endpoints for monitoring:
 8. **Limit network access** to database and management interface
 9. **Rotate JWT keys periodically** (requires user re-authentication)
 
-### Additional Resources
+
+## AI Chat Functionality
+
+This application includes an AI-powered chat assistant that uses Anthropic's Claude API to help users with certification content.
+
+**API Endpoint**: The chat functionality is available at `/public/certifications/{id}/chat`
+
+### API Usage
+
+```bash
+curl -X POST http://localhost:41085/public/certifications/{certification-id}/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Can you explain this concept better?",
+    "certificationId": "linux-home-server",
+    "pageId": "step-1",
+    "sessionId": "uuid-v4-generated-by-client",
+    "history": [
+      {"role": "user", "content": "Previous question"},
+      {"role": "assistant", "content": "Previous answer"}
+    ]
+  }'
+```
+
+### Configuration
+
+The AI chat functionality requires:
+
+- `ANTHROPIC_API_KEY`: Your Anthropic Claude API key
+- The chat uses Claude 3.5 Sonnet model by default
+- Responses are configured with 0.7 temperature for balanced creativity
+- Maximum token limit is set to 4000 tokens per response
+
+
+
+## Additional Resources
 
 - TODO e.g. [RFC 7636 - PKCE](https://datatracker.ietf.org/doc/html/rfc7636)
 
