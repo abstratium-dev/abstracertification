@@ -43,7 +43,9 @@ export class ChatService {
         body: JSON.stringify(request)
       }).then(response => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          let e: any = new Error(`HTTP error! status: ${response.status}`);
+          e.status = response.status;
+          throw e;
         }
         
         // Read the SSE stream from langchain4j Multi<String>

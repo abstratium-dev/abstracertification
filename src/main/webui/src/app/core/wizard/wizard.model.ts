@@ -86,6 +86,8 @@ export interface WizardDefinition {
   id: string;
   title: string;
   description: string;
+  /** Whether AI assistance is enabled for this certification. */
+  aiEnabled: boolean;
   /** Ordered sequence of entries (step refs or choice points) defining the flow. */
   entries: WizardEntry[];
   /** Steps referenced by DIRECT entries, in the same order as their entries. */

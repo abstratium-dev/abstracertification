@@ -43,16 +43,16 @@ describe('CertificationModelService', () => {
   describe('Certifications List', () => {
     it('should set certifications', () => {
       const certs: CertificationSummary[] = [
-        { id: 'cert-1', title: 'Cert 1', description: 'Description 1', comingSoon: false },
-        { id: 'cert-2', title: 'Cert 2', description: 'Description 2', comingSoon: true }
+        { id: 'cert-1', title: 'Cert 1', description: 'Description 1', comingSoon: false, aiEnabled: false },
+        { id: 'cert-2', title: 'Cert 2', description: 'Description 2', comingSoon: true, aiEnabled: false }
       ];
       service.setCertifications(certs);
       expect(service.certifications$()).toEqual(certs);
     });
 
     it('should update certifications', () => {
-      const certs1: CertificationSummary[] = [{ id: '1', title: 'A', description: '', comingSoon: false }];
-      const certs2: CertificationSummary[] = [{ id: '2', title: 'B', description: '', comingSoon: false }];
+      const certs1: CertificationSummary[] = [{ id: '1', title: 'A', description: '', comingSoon: false, aiEnabled: false }];
+      const certs2: CertificationSummary[] = [{ id: '2', title: 'B', description: '', comingSoon: false, aiEnabled: false }];
 
       service.setCertifications(certs1);
       expect(service.certifications$()).toEqual(certs1);
@@ -62,7 +62,7 @@ describe('CertificationModelService', () => {
     });
 
     it('should handle empty certifications list', () => {
-      service.setCertifications([{ id: '1', title: 'A', description: '', comingSoon: false }]);
+      service.setCertifications([{ id: '1', title: 'A', description: '', comingSoon: false, aiEnabled: false }]);
       service.setCertifications([]);
       expect(service.certifications$()).toEqual([]);
     });
@@ -99,7 +99,7 @@ describe('CertificationModelService', () => {
   describe('Current Certification', () => {
     it('should set current certification', () => {
       const definition: WizardDefinition = {
-        id: 'test', title: 'Test', description: 'Desc',
+        id: 'test', title: 'Test', description: 'Desc', aiEnabled: false,
         entries: [], steps: [], choiceSteps: new Map()
       };
       service.setCurrentCertification(definition);
@@ -108,7 +108,7 @@ describe('CertificationModelService', () => {
 
     it('should clear current certification', () => {
       const definition: WizardDefinition = {
-        id: 'test', title: 'Test', description: 'Desc',
+        id: 'test', title: 'Test', description: 'Desc', aiEnabled: false,
         entries: [], steps: [], choiceSteps: new Map()
       };
       service.setCurrentCertification(definition);
@@ -136,8 +136,8 @@ describe('CertificationModelService', () => {
   describe('Service Singleton', () => {
     it('should be a singleton across injections', () => {
       const service2 = TestBed.inject(CertificationModelService);
-      service.setCertifications([{ id: '1', title: 'A', description: '', comingSoon: false }]);
-      expect(service2.certifications$()).toEqual([{ id: '1', title: 'A', description: '', comingSoon: false }]);
+      service.setCertifications([{ id: '1', title: 'A', description: '', comingSoon: false, aiEnabled: false }]);
+      expect(service2.certifications$()).toEqual([{ id: '1', title: 'A', description: '', comingSoon: false, aiEnabled: false }]);
     });
   });
 
@@ -165,7 +165,7 @@ describe('CertificationModelService', () => {
 
     it('should persist maxReachedEntryIndex to localStorage', () => {
       const definition: WizardDefinition = {
-        id: 'test-cert', title: 'Test', description: 'Desc',
+        id: 'test-cert', title: 'Test', description: 'Desc', aiEnabled: false,
         entries: [], steps: [], choiceSteps: new Map()
       };
 
@@ -182,7 +182,7 @@ describe('CertificationModelService', () => {
 
     it('should persist choiceSelections to localStorage', () => {
       const definition: WizardDefinition = {
-        id: 'test-cert', title: 'Test', description: 'Desc',
+        id: 'test-cert', title: 'Test', description: 'Desc', aiEnabled: false,
         entries: [], steps: [], choiceSteps: new Map()
       };
 
@@ -205,7 +205,7 @@ describe('CertificationModelService', () => {
       }));
 
       const definition: WizardDefinition = {
-        id: 'existing-cert', title: 'Test', description: 'Desc',
+        id: 'existing-cert', title: 'Test', description: 'Desc', aiEnabled: false,
         entries: [], steps: [], choiceSteps: new Map()
       };
 
@@ -215,6 +215,26 @@ describe('CertificationModelService', () => {
       expect(service.choiceSelections$().get('Setup')).toEqual(new Set([1]));
     });
 
+    it('should not overwrite existing localStorage progress with 0 when loading same certification', () => {
+      localStorage.setItem('wizard-progress-linux-home-server', JSON.stringify({
+        maxReachedEntryIndex: 10,
+        choiceSelections: {}
+      }));
+
+      const definition: WizardDefinition = {
+        id: 'linux-home-server', title: 'Linux Home Server', description: 'Desc',
+        aiEnabled: false, entries: [], steps: [], choiceSteps: new Map()
+      };
+
+      service.setCurrentCertification(definition, 'linux-home-server');
+      TestBed.flushEffects();
+
+      const stored = localStorage.getItem('wizard-progress-linux-home-server');
+      expect(stored).toBeTruthy();
+      expect(JSON.parse(stored!).maxReachedEntryIndex).toBe(10);
+      expect(service.maxReachedEntryIndex$()).toBe(10);
+    });
+
     it('should reset progress when resetMaxReachedEntryIndex is called', () => {
       localStorage.setItem('wizard-progress-reset-cert', JSON.stringify({
         maxReachedEntryIndex: 5,
@@ -222,7 +242,7 @@ describe('CertificationModelService', () => {
       }));
 
       const definition: WizardDefinition = {
-        id: 'reset-cert', title: 'Test', description: 'Desc',
+        id: 'reset-cert', title: 'Test', description: 'Desc', aiEnabled: false,
         entries: [], steps: [], choiceSteps: new Map()
       };
 
@@ -253,11 +273,11 @@ describe('CertificationModelService', () => {
 
     it('should isolate progress per certification', () => {
       const def1: WizardDefinition = {
-        id: 'cert-1', title: 'Cert 1', description: 'Desc',
+        id: 'cert-1', title: 'Cert 1', description: 'Desc', aiEnabled: false,
         entries: [], steps: [], choiceSteps: new Map()
       };
       const def2: WizardDefinition = {
-        id: 'cert-2', title: 'Cert 2', description: 'Desc',
+        id: 'cert-2', title: 'Cert 2', description: 'Desc', aiEnabled: false,
         entries: [], steps: [], choiceSteps: new Map()
       };
 

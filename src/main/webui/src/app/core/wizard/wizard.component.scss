@@ -103,7 +103,18 @@
   padding: 0.75rem 1rem; font-family: 'Courier New', monospace; font-size: 0.9rem;
   margin-bottom: 0.5rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all;
 }
-.step-note { margin: 0.25rem 0 0 0; font-size: 1.0rem; font-style: italic; color: var(--color-text-secondary); }
+.step-note {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+
+  p { margin: 0 0 0.5rem 0; &:last-child { margin-bottom: 0; } }
+  code { font-style: normal; background: var(--color-bg-tertiary); border-radius: 3px; padding: 0.1em 0.35em; font-size: 0.88rem; }
+  pre { font-style: normal; background: var(--color-bg-tertiary); border-radius: 4px; padding: 0.6rem 0.9rem; overflow-x: auto; white-space: pre-wrap; margin: 0.4rem 0; }
+  ul, ol { margin: 0.25rem 0 0.5rem 1.25rem; padding: 0; }
+  li { margin-bottom: 0.2rem; }
+  strong { font-style: normal; font-weight: 700; color: var(--color-text-primary); }
+}
 
 .questions-section {
   margin-bottom: 2rem; padding-top: 1.5rem; border-top: 2px solid var(--color-border-primary);
@@ -119,11 +130,13 @@
   display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;
   border: 1px solid var(--color-border-primary); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;
   &:hover:not(.disabled) { background: var(--color-bg-hover); border-color: var(--color-primary); }
-  &.selected:not(.correct):not(.incorrect) { border-color: var(--color-primary); background: var(--color-badge-primary-bg); }
+  &.selected:not(.incorrect) { border-color: var(--color-primary); background: var(--color-badge-primary-bg); }
   &.correct { border-color: var(--color-success); background: var(--color-success-bg); }
   &.incorrect { border-color: var(--color-error); background: var(--color-error-bg); }
   &.disabled { cursor: default; opacity: 0.85; }
   input[type="radio"] { margin: 0; accent-color: var(--color-primary); }
+  &.selected input[type="radio"] { accent-color: var(--color-primary); opacity: 1; }
+  &.selected input[type="radio"]:disabled { appearance: none; -webkit-appearance: none; width: 1em; height: 1em; border-radius: 50%; border: 2px solid var(--color-primary); background: radial-gradient(circle, var(--color-primary) 45%, transparent 45%); flex-shrink: 0; }
 }
 .option-text { line-height: 1.4; }
 .question-actions { display: flex; gap: 0.5rem; }
@@ -249,6 +262,7 @@
 
   textarea {
     width: 100%;
+    box-sizing: border-box;
     padding: 0.75rem;
     border: 1px solid var(--color-border-primary);
     border-radius: 4px;

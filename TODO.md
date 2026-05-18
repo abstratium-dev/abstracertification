@@ -9,17 +9,30 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
-- integrate toggles - update abstracore to provide caching and interpretation. it should use the id token to build a map and that map can be used. it can add ip address to that too so that later it could base the decision on geolocation. 
+- integrate toggles - update abstracore to provide caching and interpretation. it should use the id token to build a map and that map can be used. it can add ip address to that too so that later it could base the decision on geolocation.
+
 - put Maxs feedback into certifications
+
+- improve test coverage
+
 - make fonts friendlier
+
 - simplify the overviews, they're too long
+
 - stripe integration
+
 - create pdf for downloading
-- badges
+
+- badges so that users can add them to their website
+
 - allow signing up in prod, but requires default roles - is that something we already implemented?
+
 - abstrauth should do service token expiry, that is only half built
+
 - fix bug that refresh ruins the url that was in the browser and returns the user to the home page
-- add other necessary microservices
+
+- add other necessary microservices - see abstrerp
+
 - allow me to sign in
   - if admin then allow to view feedback and contact and enable/disable certifications
 
@@ -73,15 +86,10 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
     - including how to make it so that they are auto updated
   - certification on setting up and deploying abstrauth
   - setting up a secure samba server for file sharing
+  - use abstravault or a kdg to secure the drive
 
 
-- [ ] - Update SECURITY_DESIGN.md with project-specific information
-- [ ] - Update SECURITY.md with project-specific information
-- [ ] - Update `.windsurf` configuration
 
-## FIXME
-
-- **SECURITY_DESIGN.md**: File not found at `docs/security/SECURITY_DESIGN.md` — needs to be created or the link in README.md needs updating.
 - **`.windsurf` configuration**: The `.windsurf/rules/` files may need project-specific updates (no TODOs found currently).
 - **e2e-tests/pages/TODO.page.ts**: This file should be deleted — a replacement `certification.page.ts` has been created.
 

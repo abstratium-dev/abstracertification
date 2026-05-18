@@ -30,11 +30,29 @@ public class ChatService {
     boolean provideAiHelp;
 
     public Multi<String> generateResponse(String userMessage, String certificationId, String pageId, List<ChatMessage> history, String sessionId) {
+        // Check global AI property first
         if (!provideAiHelp) {
             return Multi.createFrom().emitter(e -> {
-                LOG.infof("AI help is disabled for session: %s", sessionId);
+                LOG.infof("AI help is disabled globally for session: %s", sessionId);
                 e.emit("AI help is disabled for this certification. Please contact support if you need assistance.");
                 e.complete();
+            });
+        }
+        
+        // Check certification-specific AI setting
+        try {
+            var certification = certificationService.findById(certificationId);
+            if (certification == null || !certification.getAiEnabled()) {
+                return Multi.createFrom().emitter(e -> {
+                    LOG.infof("AI help is disabled for certification: %s, session: %s", certificationId, sessionId);
+                    e.emit("AI help is disabled for this certification. Please contact support if you need assistance.");
+                    e.complete();
+                });
+            }
+        } catch (Exception e) {
+            LOG.errorf(e, "Error checking certification AI setting for session: %s", sessionId);
+            return Multi.createFrom().emitter(emitter -> {
+                emitter.fail(new RuntimeException("Unable to verify certification AI settings"));
             });
         }
         

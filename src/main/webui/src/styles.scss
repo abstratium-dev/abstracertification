@@ -166,11 +166,11 @@
   --color-badge-unverified: #ff6b6b;
   
   /* Link colors */
-  --color-link: #6ba5ff;
-  --color-link-primary: #5a9aff;
-  --color-link-hover: #74c0fc;
-  --color-link-active: #91d7ff;
-  --color-link-light: #4285f4;
+  --color-link: #8ab4f8;
+  --color-link-primary: #8ab4f8;
+  --color-link-hover: #aecbfa;
+  --color-link-active: #d2e3fc;
+  --color-link-light: #669df6;
   
   /* Google button colors */
   --color-google-bg: #2a2a2a;
@@ -254,7 +254,7 @@ h2 {
 .description {
   color: var(--color-text-secondary);
   margin-bottom: 1.5rem;
-  font-size: 0.95rem;
+  font-size: 1.30rem;
 }
 
 /* ===== FORMS ===== */
@@ -648,6 +648,39 @@ h2 {
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+/* Markdown component links */
+markdown {
+  a {
+    color: var(--color-link);
+    text-decoration: underline;
+    
+    &:hover {
+      color: var(--color-link-hover);
+      text-decoration: underline;
+    }
+    
+    &:visited {
+      color: var(--color-link-light);
+    }
+  }
+}
+
+.step-text, .step-note {
+  a {
+    color: var(--color-link);
+    text-decoration: underline;
+    
+    &:hover {
+      color: var(--color-link-hover);
+      text-decoration: underline;
+    }
+    
+    &:visited {
+      color: var(--color-link-light);
+    }
   }
 }
 

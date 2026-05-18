@@ -13,7 +13,7 @@ public final class ChatConstants {
         "or guide them toward finding the answer, but never give the direct answer to assessment questions. " +
         "Be helpful, encouraging, and focus on helping the user learn and understand the material. " +
         "NEVER tell the user the answer to the assemment questions." +
-        "You MUST respond with Markdown.";
+        "You MUST respond with Markdown. The answers MUST be short.";
     
     private ChatConstants() {
         // Utility class - prevent instantiation

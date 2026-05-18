@@ -2,8 +2,8 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, injec
 import { CommonModule } from '@angular/common';
 import { MarkdownComponent, type MermaidAPI } from 'ngx-markdown';
 import { ThemeService } from '../theme.service';
-import { ChatWindowComponent, ChatMessage } from '../chat/chat-window.component';
-import { ChatService, ChatRequest } from '../chat/chat.service';
+import { ChatWindowComponent } from '../chat/chat-window.component';
+import { ChatService, ChatRequest, ChatMessage } from '../chat/chat.service';
 import { ModelService } from '../../model.service';
 import {
   WizardDefinition, WizardStep, WizardChoicePoint, WizardEntry,
@@ -88,7 +88,11 @@ export class WizardComponent implements OnChanges {
   private modelService = inject(ModelService);
   private chatSessionId: string = '';
 
-  provideAiHelp: Signal<boolean> = computed(() => this.modelService.config$()?.provideAiHelp ?? false);
+  provideAiHelp: Signal<boolean> = computed(() => {
+    const globalAiEnabled = this.modelService.config$()?.provideAiHelp ?? false;
+    const certificationAiEnabled = this.definition?.aiEnabled ?? false;
+    return globalAiEnabled && certificationAiEnabled;
+  });
 
   readonly FONT_SIZE_KEY = 'wizard-font-size';
   fontSize: 'small' | 'medium' | 'large' = this.loadFontSize();
@@ -702,6 +706,8 @@ export class WizardComponent implements OnChanges {
       if (!state.isOpen) {
         state.text = '';
         state.error = null;
+      } else {
+        state.submitted = false;
       }
     }
   }
@@ -713,6 +719,8 @@ export class WizardComponent implements OnChanges {
       if (!state.isOpen) {
         state.text = '';
         state.error = null;
+      } else {
+        state.submitted = false;
       }
     }
   }
@@ -853,7 +861,11 @@ export class WizardComponent implements OnChanges {
       error: (error) => {
         console.error('Chat error:', error);
         // Replace partial message with error message
-        assistantMessage.content = 'Sorry, I encountered an error. Please try again later.';
+        if(error.status === 429) {
+          assistantMessage.content = 'You have run out of tokens. Please try again later.';
+        } else {
+          assistantMessage.content = 'Sorry, I encountered an error. Please try again later.';
+        }
         this.chatMessages = [...this.chatMessages];
         this.isChatLoading = false;
       },

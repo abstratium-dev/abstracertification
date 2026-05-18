@@ -97,13 +97,10 @@
 
     <!-- INFO section -->
     <section class="info-section" *ngIf="currentStep.infoItems && currentStep.infoItems.length > 0">
-      <div class="info-header" (click)="toggleInfoExpanded(currentStep.id)">
-        <h3>Key Concepts<span *ngIf="!isInfoExpanded(currentStep.id)" class="click-hint"> (click here to open)</span></h3>
-        <button type="button" class="toggle-btn" [attr.aria-expanded]="isInfoExpanded(currentStep.id)">
-          <span class="toggle-icon" [class.expanded]="isInfoExpanded(currentStep.id)">&#9660;</span>
-        </button>
+      <div class="info-header">
+        <h3>Key Concepts</h3>
       </div>
-      <div class="info-box" *ngIf="isInfoExpanded(currentStep.id)">
+      <div class="info-box">
         <dl class="info-list">
           <div *ngFor="let item of currentStep.infoItems" class="info-item">
             <dt class="info-term">{{ item.term }}</dt>
@@ -119,13 +116,13 @@
       <ol class="instruction-list">
         <li *ngFor="let instr of currentStep.instructions" class="instruction-step">
           <div class="instruction-content">
-            <p class="step-text">{{ instr.text }}</p>
+            <markdown class="step-text" [data]="instr.text"></markdown>
           </div>
           <div *ngIf="instr.mermaid" class="mermaid-diagram">
             <markdown mermaid [mermaidOptions]="mermaidOptions()" [data]="'```mermaid\n' + instr.mermaid + '\n```'"></markdown>
           </div>
           <code *ngIf="instr.command" class="step-command">{{ instr.command }}</code>
-          <p *ngIf="instr.note" class="step-note">{{ instr.note }}</p>
+          <markdown *ngIf="instr.note" class="step-note" [data]="instr.note"></markdown>
         </li>
       </ol>
     </section>
@@ -203,7 +200,7 @@
           <label
             *ngFor="let option of question.options"
             class="option-label"
-            [class.selected]="!pageSubmitted && getSelectedAnswer(question.id) === option.id"
+            [class.selected]="getSelectedAnswer(question.id) === option.id"
             [class.incorrect]="pageSubmitted && isSelectedOptionWrong(question.id, option.id)"
             [class.disabled]="pageSubmitted">
             <input

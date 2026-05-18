@@ -16,6 +16,9 @@ import dev.abstratium.certification.entity.CertificationStep;
 import dev.abstratium.certification.entity.Question;
 import dev.abstratium.certification.service.CertificationService;
 import dev.abstratium.certification.service.ChatService;
+import dev.abstratium.certification.service.TokenUsageService;
+import dev.abstratium.core.IpAddressUtil;
+import io.vertx.ext.web.RoutingContext;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -23,6 +26,8 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -40,6 +45,9 @@ public class PublicCertificationResource {
 
     @Inject
     ChatService chatService;
+
+    @Inject
+    TokenUsageService tokenUsageService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -107,7 +115,8 @@ public class PublicCertificationResource {
     @Path("/{id}/chat")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public Response chat(@PathParam("id") String id, ChatRequest request) {
+    public Response chat(@PathParam("id") String id, ChatRequest request, 
+                        @Context HttpHeaders headers, @Context RoutingContext routingContext) {
         LOG.infof("Chat endpoint called for certification: %s, session: %s", id, request.getSessionId());
         
         // Validate request
@@ -129,6 +138,33 @@ public class PublicCertificationResource {
             return Response.status(Response.Status.BAD_REQUEST)
                     .type(MediaType.APPLICATION_JSON)
                     .entity(Map.of("error", "Page ID is required"))
+                    .build();
+        }
+
+        // Extract client IP for rate limiting
+        String clientIp = IpAddressUtil.extractIpAddress(headers, routingContext);
+        LOG.debugf("Chat request from IP: %s", clientIp);
+
+        // Check token rate limit
+        // Estimate tokens needed for this request (rough estimate: 1 token per 4 characters + 100 for overhead)
+        int estimatedTokens = (request.getMessage().length() / 4) + 100;
+        
+        if (!tokenUsageService.canConsumeTokens(clientIp, estimatedTokens)) {
+            int currentUsage = tokenUsageService.getCurrentUsage(clientIp);
+            int remainingTokens = tokenUsageService.getRemainingTokens(clientIp);
+            
+            LOG.warnf("Token limit exceeded for IP %s: current=%d, requested=%d, remaining=%d", 
+                     clientIp, currentUsage, estimatedTokens, remainingTokens);
+            
+            return Response.status(Response.Status.TOO_MANY_REQUESTS)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(Map.of(
+                        "error", "TOKEN_LIMIT_EXCEEDED",
+                        "message", "You have reached your daily AI token limit. Please try again tomorrow.",
+                        "currentUsage", currentUsage,
+                        "dailyLimit", tokenUsageService.getDailyLimit(),
+                        "remainingTokens", remainingTokens
+                    ))
                     .build();
         }
 
@@ -157,6 +193,7 @@ public class PublicCertificationResource {
                     // Use a CountDownLatch to wait for stream completion
                     java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
                     java.util.concurrent.atomic.AtomicBoolean hasError = new java.util.concurrent.atomic.AtomicBoolean(false);
+                    java.util.concurrent.atomic.AtomicInteger totalTokensUsed = new java.util.concurrent.atomic.AtomicInteger(0);
                     
                     responseStream.subscribe().with(
                         token -> {
@@ -165,6 +202,9 @@ public class PublicCertificationResource {
                                 String jsonToken = MAPPER.writeValueAsString(token);
                                 output.write(("data: " + jsonToken + "\n\n").getBytes());
                                 output.flush();
+                                
+                                // Rough token estimation for streaming content
+                                totalTokensUsed.addAndGet(token.length() / 4);
                             } catch (Exception e) {
                                 LOG.errorf(e, "Error writing SSE token");
                                 hasError.set(true);
@@ -182,6 +222,16 @@ public class PublicCertificationResource {
                         },
                         () -> {
                             LOG.infof("SSE stream completed for session: %s", request.getSessionId());
+                            
+                            // Record actual token usage (add estimated input tokens from the request)
+                            int inputTokens = (request.getMessage().length() / 4) + 50; // Rough estimate for input
+                            int outputTokens = totalTokensUsed.get();
+                            int totalTokens = inputTokens + outputTokens;
+                            
+                            tokenUsageService.recordTokenUsage(clientIp, totalTokens);
+                            LOG.infof("Recorded token usage for IP %s: %d tokens (input: %d, output: %d)", 
+                                     clientIp, totalTokens, inputTokens, outputTokens);
+                            
                             latch.countDown();
                         }
                     );

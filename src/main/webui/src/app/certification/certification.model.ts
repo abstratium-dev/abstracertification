@@ -8,6 +8,7 @@ export interface CertificationSummary {
   title: string;
   description: string;
   comingSoon: boolean;
+  aiEnabled: boolean;
 }
 
 /**
@@ -102,8 +103,10 @@ export class CertificationModelService {
     if (certificationId) {
       // Track previous ID before updating
       this.previousCertificationId = this.currentCertificationId();
-      this.currentCertificationId.set(certificationId);
+      // Load progress first so maxReachedEntryIndex is correct before setting
+      // currentCertificationId (which triggers the auto-save effect).
       this.loadProgress(certificationId);
+      this.currentCertificationId.set(certificationId);
     }
   }
 

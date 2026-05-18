@@ -12,4 +12,7 @@ public interface Roles {
 
     /** Users with this role can manage certifications. */
     String MANAGE_CERTIFICATIONS = CLIENT_ID + "_manage-certifications";
+
+    /** Users with this role can access admin endpoints and monitor system usage. */
+    String ADMIN = CLIENT_ID + "_admin";
 }

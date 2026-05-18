@@ -49,6 +49,9 @@ public class Certification {
     @Column(name = "sequence_order", nullable = false)
     private Integer sequenceOrder = 0;
 
+    @Column(name = "ai_enabled", nullable = false)
+    private Boolean aiEnabled = false;
+
     @OneToMany(mappedBy = "certification", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CertificationStep> steps = new ArrayList<>();
 
@@ -120,6 +123,14 @@ public class Certification {
 
     public void setSequenceOrder(Integer sequenceOrder) {
         this.sequenceOrder = sequenceOrder;
+    }
+
+    public Boolean getAiEnabled() {
+        return aiEnabled;
+    }
+
+    public void setAiEnabled(Boolean aiEnabled) {
+        this.aiEnabled = aiEnabled;
     }
 
     public List<CertificationStep> getSteps() {

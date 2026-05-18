@@ -47,11 +47,15 @@ export class CertificationWizardComponent implements OnInit, OnDestroy {
       this.initialStepIndex = pageParam ? parseInt(pageParam, 10) - 1 : 0;
       console.log('[DEBUG] route changed:', { newCertificationId, pageParam, currentId: this.certificationId, isNavigatingFromStepChange: this.isNavigatingFromStepChange, initialStepIndex: this.initialStepIndex });
 
-      // Reset max reached step if certification changed
+      // Reset max reached step only when switching between two different certifications
+      // (not on first load when certificationId is still empty)
       if (newCertificationId !== this.certificationId) {
-        console.log('[DEBUG] certification changed, resetting maxReached');
+        const isSwitchingCertification = this.certificationId !== '' && newCertificationId !== this.certificationId;
+        console.log('[DEBUG] certification changed, isSwitching:', isSwitchingCertification);
         this.certificationId = newCertificationId;
-        this.modelService.resetMaxReachedEntryIndex();
+        if (isSwitchingCertification) {
+          this.modelService.resetMaxReachedEntryIndex();
+        }
         this.hasValidatedPage = false;
       }
 

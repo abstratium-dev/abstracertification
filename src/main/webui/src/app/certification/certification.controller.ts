@@ -16,6 +16,7 @@ interface BackendCertification {
   id: string;
   title: string;
   description: string;
+  aiEnabled: boolean;
   pageEntries: BackendPageEntry[];
   steps: BackendCertificationStep[];
 }
@@ -204,6 +205,7 @@ export class CertificationController {
       id: cert.id,
       title: cert.title,
       description: cert.description,
+      aiEnabled: cert.aiEnabled,
       entries,
       steps,
       choiceSteps
