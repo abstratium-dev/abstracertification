@@ -90,8 +90,6 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 # TODO later after implementing your first feature
 
-- remove all references to `demo` in the entire project
-- remove all files with `demo` in their name
 - add contact table (see migration script V01.014__) to GDPR management
 - add user-certifications to GDPR management
 
