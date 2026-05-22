@@ -83,16 +83,11 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 - move wizard which is in core back up to abstracore
 
 - further modules
+  - raspberrypi as print server
   - remote desktop on linux
+  - virtual box and run windsurf inside to avoid LLM breaking out
+  - docker and installing some abstratium services to play around, including mysql, grafana, etc.
   - security and hardening with optional remote internet access to the server.
-    - fail2ban
-    - disk encryption using abstravault
-    - firewall
-    - disable ping
-    - ssh hardening including certificate based authentication
-    - nginx rate limiting
-    - pageant (windows only)
-    - etc.
   - wireguard vpn (peer to peer but as "client" and "server")
   - SSL with certbot from letsencrypt
     - including how to make it so that they are auto updated
