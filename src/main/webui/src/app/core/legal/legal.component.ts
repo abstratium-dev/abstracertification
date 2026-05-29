@@ -1,16 +1,18 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-legal',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './legal.component.html',
   styleUrl: './legal.component.scss'
 })
 export class LegalComponent {
-  readonly foundingYear = 2026;
-  readonly currentYear = new Date().getFullYear();
-  readonly copyrightYears = this.currentYear > this.foundingYear
-    ? `${this.foundingYear}–${this.currentYear}`
-    : `${this.foundingYear}`;
+  copyrightYears: string;
+
+  constructor() {
+    const year = new Date().getFullYear();
+    this.copyrightYears = year > 2026 ? `2026 - ${year}` : String(year);
+  }
 }

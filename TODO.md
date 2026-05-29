@@ -9,6 +9,10 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
+- after merging upstream
+  - is legal page still good?
+  - is header good?
+
 - advertise that it is AI based, if it is such.
 
 - add a classification field, and group by classification. IT, Business, etc.

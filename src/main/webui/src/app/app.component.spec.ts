@@ -1,11 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
-import { AppComponent } from './app.component';
 import { AuthService, ANONYMOUS } from './core/auth.service';
 import { ThemeService } from './core/theme.service';
 import { ToastService } from './core/toast/toast.service';
 import { ConfirmDialogService } from './core/confirm-dialog/confirm-dialog.service';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { AppComponent } from './app.component';
+import { WINDOW } from './core/window.token';
 
 describe('AppComponent', () => {
   let mockAuthService: jasmine.SpyObj<AuthService>;
@@ -44,7 +47,10 @@ describe('AppComponent', () => {
         { provide: AuthService, useValue: mockAuthService },
         { provide: ThemeService, useValue: mockThemeService },
         { provide: ToastService, useValue: mockToastService },
-        { provide: ConfirmDialogService, useValue: mockConfirmDialogService }
+        { provide: ConfirmDialogService, useValue: mockConfirmDialogService },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: WINDOW, useValue: window }
       ]
     }).compileComponents();
   });

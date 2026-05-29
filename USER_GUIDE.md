@@ -116,13 +116,13 @@ _Replace all `TODO_...` values with the values generated above.
      -e ABSTRATIUM_CLIENT_ID="abstratium-abstracertification" \
      -e ABSTRATIUM_CLIENT_SECRET="YOUR_OIDC_CLIENT_SECRET" \
      -e ANTHROPIC_API_KEY="YOUR_ANTHROPIC_API_KEY" \
-     -e MAIL_HOST="YOUR_SMTP_HOST" \
-     -e MAIL_PORT="587" \
-     -e MAIL_TLS="true" \
-     -e MAIL_USERNAME="YOUR_SMTP_USERNAME" \
-     -e MAIL_PASSWORD="YOUR_SMTP_PASSWORD" \
-     -e MAIL_FROM="noreply@yourdomain.com" \
-     -e CONTACT_MAIL_TO="contact@yourdomain.com" \
+     -e SMTP_HOST="YOUR_SMTP_HOST" \
+     -e SMTP_PORT="587" \
+     -e SMTP_TLS="true" \
+     -e SMTP_USERNAME="YOUR_SMTP_USERNAME" \
+     -e SMTP_PASSWORD="YOUR_SMTP_PASSWORD" \
+     -e SMTP_FROM="noreply@yourdomain.com" \
+     -e EMAIL_FROM="contact@yourdomain.com" \
      ghcr.io/abstratium-dev/abstracertification:latest
    ```
 
@@ -134,18 +134,23 @@ _Replace all `TODO_...` values with the values generated above.
    - `CSRF_TOKEN_SIGNATURE_KEY`: CSRF token signature key (min 32 chars, generate with `openssl rand -base64 64 | tr -d '\n'`)
    - `ABSTRATIUM_CLIENT_SECRET`: OAuth2 client secret from authentication server
    - `ANTHROPIC_API_KEY`: Anthropic Claude API key for AI chat functionality (get from https://console.anthropic.com/)
-   - `MAIL_HOST`: SMTP server hostname (e.g. `smtp.sendgrid.net`)
-   - `MAIL_PORT`: SMTP server port (default: `587`)
-   - `MAIL_TLS`: Enable TLS for SMTP connection (`true` or `false`, default: `true`)
-   - `MAIL_USERNAME`: SMTP authentication username
-   - `MAIL_PASSWORD`: SMTP authentication password
-   - `MAIL_FROM`: Sender email address for outgoing notifications (default: `noreply@abstratium.dev`)
-   - `CONTACT_MAIL_TO`: Recipient email address for contact form submissions (default: `contact@abstratium.dev`)
-   - `ABSTRA_WARNING_MESSAGE`: Warning banner message displayed at the top of the UI (e.g., "You are in the TEST environment!"). Set to "-" or leave empty to hide the banner.
+   - `SMTP_HOST`: SMTP server hostname (e.g. `smtp.sendgrid.net`)
+   - `SMTP_PORT`: SMTP server port (default: `587`)
+   - `SMTP_TLS`: Enable TLS for SMTP connection (`true` or `false`, default: `true`)
+   - `SMTP_USERNAME`: SMTP authentication username
+   - `SMTP_PASSWORD`: SMTP authentication password
+   - `EMAIL_FROM`: Sender email address for outgoing notifications (default: `noreply@abstratium.dev`)
+   - `ABSTRATIUM_TOGGLES_API_URL`: URL of the Abstoggle public API (e.g., `https://toggles.abstratium.dev`, required in production only)
+   - `ABSTRATIUM_TOGGLES_CONTEXT`: Context for the Abstoggle public API (e.g., `abstratium-public-...`)
    - `STAGE`: Deployment stage identifier exposed to the frontend (e.g., "dev", "test", "prod", defaults to "dev")
-   
+
    **Optional Environment Variables:**
    - `DEPLOYMENT_ENV`: Deployment environment name (default: `dev`)
+   - `ABSTRA_WARNING_MESSAGE`: Warning banner message displayed at the top of the UI (e.g., "You are in the TEST environment!"). Set to "-" or omit to hide the banner.
+   - `ABSTRA_WARNING_BG_COLOR`: Warning banner background colour (CSS colour value, e.g., `#ff4444` for red). Defaults to `#fff3cd` (amber yellow). Useful for differentiating environments at a glance.
+   - `ABSTRA_BRAND_LOGO_URL`: URL of the logo image shown in the header. Defaults to `https://abstratium.dev/abstratium-logo-small.png`.
+   - `ABSTRA_BRAND_LOGO_ALT`: Alt text for the header logo image. Defaults to `Abstratium Logo`.
+   - `ABSTRA_BRAND_NAME`: Brand name text shown next to the logo in the header. Defaults to `ABSTRATIUM`.
 
 
 3. **Verify the container is running**:

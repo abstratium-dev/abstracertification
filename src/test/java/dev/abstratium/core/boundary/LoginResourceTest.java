@@ -26,6 +26,6 @@ class LoginResourceTest {
             .get("/api/auth/login")
             .then()
             .statusCode(303)
-            .header("Location", equalTo("http://localhost:10085/"));
+            .header("Location", equalTo("http://localhost:10085/signed-in"));
     }
 }

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 import { HeaderComponent } from './header.component';
 import { AuthService, ANONYMOUS } from '../core/auth.service';
@@ -26,7 +28,10 @@ describe('HeaderComponent', () => {
       providers: [
         provideRouter([]),
         { provide: AuthService, useValue: mockAuthService },
-        { provide: ThemeService, useValue: mockThemeService }
+        { provide: ThemeService, useValue: mockThemeService },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([])
       ]
     })
     .compileComponents();

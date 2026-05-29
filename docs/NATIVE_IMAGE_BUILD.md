@@ -27,6 +27,8 @@ docker run -it --rm \
   -e QUARKUS_DATASOURCE_PASSWORD=secret \
   -e ABSTRATIUM_CLIENT_ID="abstratium-abstracertification" \
   -e ABSTRATIUM_CLIENT_SECRET="${ABSTRATIUM_CLIENT_SECRET}" \
+  -e QUARKUS_OIDC_AUTH_SERVER_URL="https://auth-t.abstratium.dev" \
+  -e QUARKUS_OIDC_AUTHENTICATION_FORCE_REDIRECT_HTTPS_SCHEME=false \
   -e CSRF_TOKEN_SIGNATURE_KEY="KU/PESqYGdsE0psW7aOaXF/tszvDKCecFo/1u3tSKoQmo4YZfEjZNvUppot1svY1Yj9oub4GSy/5mueqfRlKOw==" \
   -e COOKIE_ENCRYPTION_SECRET="dnde2xhez89RGV0nJHqSR8Khu3SFCE6fxqCgDzu9Hng=" \
   -e SMTP_HOST="${SMTP_HOST}" \
@@ -36,6 +38,11 @@ docker run -it --rm \
   -e EMAIL_FROM="${EMAIL_FROM}" \
   -e ANTHROPIC_API_KEY="not-set" \
   ghcr.io/abstratium-dev/abstracertification:latest
+  -e OAUTH_REDIRECT_URI="http://localhost:808x/oauth/callback" \
+  -e QUARKUS_MANAGEMENT_HOST=0.0.0.0 \
+  -e DEPLOYMENT_ENV="dev" \
+  -e STAGE="dev" \
+  ghcr.io/abstratium-dev/TODO:latest
 ```
 
 e2e tests will work against this running image. see dev readme for tips on how to run them manually.

@@ -7,6 +7,7 @@ import { MERMAID_OPTIONS, provideMarkdown } from 'ngx-markdown';
 import { routes } from './app.routes';
 import { AuthService } from './core/auth.service';
 import { Controller } from './controller';
+import { RouteTrackingService } from './core/route-tracking.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,5 +30,10 @@ export const appConfig: ApplicationConfig = {
       return firstValueFrom(authService.initialize());
     }),
     provideMarkdown({ mermaidOptions: { provide: MERMAID_OPTIONS, useValue: { startOnLoad: false } } }),
+    provideAppInitializer(() => {
+      const routeTracking = inject(RouteTrackingService);
+      // Start persisting route changes to localStorage after app is initialised
+      routeTracking.start();
+    }),
   ]
 };

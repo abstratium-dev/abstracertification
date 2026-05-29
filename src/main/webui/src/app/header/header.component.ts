@@ -4,6 +4,7 @@ import { Router, RouterLink, RouterLinkActive, ActivatedRoute, NavigationEnd } f
 import { filter, map } from 'rxjs';
 import { AuthService, Token } from '../core/auth.service';
 import { ThemeService } from '../core/theme.service';
+import { ModelService } from '../model.service';
 
 @Component({
     selector: 'header',
@@ -16,9 +17,15 @@ export class HeaderComponent implements OnInit {
     themeService = inject(ThemeService);
     private router = inject(Router);
     private route = inject(ActivatedRoute);
+    private modelService = inject(ModelService);
+    protected brandLogoUrl$ = this.modelService.brandLogoUrl$;
+    protected brandLogoAlt$ = this.modelService.brandLogoAlt$;
+    protected brandName$ = this.modelService.brandName$;
 
     token!: Token;
     isSignedIn = false;
+    sessionFraction = 1;
+    sessionMinutesRemaining = 0;
 
     /** Current certification ID when on a certification page */
     certificationId = signal<string | null>(null);
@@ -33,6 +40,11 @@ export class HeaderComponent implements OnInit {
         effect(() => {
             this.token = this.authService.token$();
             this.isSignedIn = this.token.isAuthenticated;
+        });
+
+        effect(() => {
+            this.sessionFraction = this.authService.sessionFraction$();
+            this.sessionMinutesRemaining = this.authService.sessionMinutesRemaining$();
         });
     }
 
@@ -99,8 +111,17 @@ export class HeaderComponent implements OnInit {
         this.themeService.toggleTheme();
     }
 
-    signout() {
-        this.authService.signout();
+    signOut() {
+        this.authService.signOut();
+    }
+
+    signIn() {
+        this.authService.signIn();
+    }
+
+    get sessionClockDashoffset(): number {
+        const circumference = 2 * Math.PI * 7;
+        return circumference * (1 - this.sessionFraction);
     }
 
     // --- Certification page controls ---
