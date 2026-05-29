@@ -183,7 +183,6 @@ public class PublicCertificationResource {
                     request.getMessage(),
                     id,
                     request.getPageId(),
-                    request.getHistory(),
                     request.getSessionId()
             );
 

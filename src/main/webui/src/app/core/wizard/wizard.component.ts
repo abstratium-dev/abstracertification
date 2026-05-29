@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject, computed, Signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnInit, OnDestroy, SimpleChanges, inject, computed, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MarkdownComponent, type MermaidAPI } from 'ngx-markdown';
 import { ThemeService } from '../theme.service';
@@ -32,7 +32,7 @@ export interface ResolvedWizardStep {
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.scss',
 })
-export class WizardComponent implements OnChanges {
+export class WizardComponent implements OnChanges, OnInit, OnDestroy {
   @Input() definition: WizardDefinition | null = null;
 
   /** Initial step index to start on (0-based). Used when restoring from URL. */
@@ -102,6 +102,23 @@ export class WizardComponent implements OnChanges {
   readonly mermaidOptions = computed((): MermaidAPI.MermaidConfig =>
     ({ theme: this.themeService.theme$() === 'dark' ? 'dark' : 'default' })
   );
+
+  private fontSizeChangeListener: EventListener | null = null;
+
+  ngOnInit(): void {
+    // Listen for font size changes from header
+    this.fontSizeChangeListener = (event: Event) => {
+      const customEvent = event as CustomEvent<'small' | 'medium' | 'large'>;
+      this.fontSize = customEvent.detail;
+    };
+    window.addEventListener('fontSizeChange', this.fontSizeChangeListener);
+  }
+
+  ngOnDestroy(): void {
+    if (this.fontSizeChangeListener) {
+      window.removeEventListener('fontSizeChange', this.fontSizeChangeListener);
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['definition'] && this.definition) {
@@ -834,13 +851,12 @@ export class WizardComponent implements OnChanges {
     this.chatMessages = [...event.history, userMessage];
     this.isChatLoading = true;
 
-    // Prepare chat request
+    // Prepare chat request (history is managed server-side via sessionId)
     const chatRequest: ChatRequest = {
       message: event.message,
       certificationId: this.certificationId,
       pageId: this.currentStep.id,
-      sessionId: this.chatSessionId,
-      history: event.history
+      sessionId: this.chatSessionId
     };
 
     // Send message to chat service

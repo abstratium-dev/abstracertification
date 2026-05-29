@@ -14,7 +14,6 @@ export interface ChatRequest {
   certificationId: string;
   pageId: string;
   sessionId: string;
-  history: ChatMessage[];
 }
 
 export interface ChatResponse {

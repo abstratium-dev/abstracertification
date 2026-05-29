@@ -16,14 +16,19 @@ public class ChatUsageLogger {
     // Claude Haiku 4.5 pricing (as of 2026-05-10)
     private static final BigDecimal INPUT_TOKEN_PRICE_PER_1K = new BigDecimal("0.0010");
     private static final BigDecimal OUTPUT_TOKEN_PRICE_PER_1K = new BigDecimal("0.0050");
+    private static final BigDecimal CACHE_WRITE_TOKEN_PRICE_PER_1K = new BigDecimal("0.00125");
+    private static final BigDecimal CACHE_READ_TOKEN_PRICE_PER_1K = new BigDecimal("0.0001");
 
     public void logChatUsage(String certificationId, String pageId, String sessionId, 
-                           int inputTokens, int outputTokens) {
+                           int inputTokens, int outputTokens,
+                           int cacheCreationTokens, int cacheReadTokens) {
         
         // Calculate costs
         BigDecimal inputCost = calculateCost(inputTokens, INPUT_TOKEN_PRICE_PER_1K);
         BigDecimal outputCost = calculateCost(outputTokens, OUTPUT_TOKEN_PRICE_PER_1K);
-        BigDecimal totalCost = inputCost.add(outputCost);
+        BigDecimal cacheWriteCost = calculateCost(cacheCreationTokens, CACHE_WRITE_TOKEN_PRICE_PER_1K);
+        BigDecimal cacheReadCost = calculateCost(cacheReadTokens, CACHE_READ_TOKEN_PRICE_PER_1K);
+        BigDecimal totalCost = inputCost.add(outputCost).add(cacheWriteCost).add(cacheReadCost);
 
         // Log comprehensive usage information
         LOG.debug("=== CHAT USAGE LOG ===");
@@ -33,9 +38,13 @@ public class ChatUsageLogger {
         LOG.debugf("Page ID: %s", pageId);
         LOG.debugf("Input Tokens: %d", inputTokens);
         LOG.debugf("Output Tokens: %d", outputTokens);
-        LOG.debugf("Total Tokens: %d", inputTokens + outputTokens);
+        LOG.debugf("Cache Writes (new cache entries): %d tokens", cacheCreationTokens);
+        LOG.debugf("Cache Hits (read from cache): %d tokens", cacheReadTokens);
+        LOG.debugf("Total Tokens: %d", inputTokens + outputTokens + cacheCreationTokens + cacheReadTokens);
         LOG.debugf("Input Cost: $%.6f", inputCost);
         LOG.debugf("Output Cost: $%.6f", outputCost);
+        LOG.debugf("Cache Write Cost (new entries @ $1.25/MTok): $%.6f", cacheWriteCost);
+        LOG.debugf("Cache Hit Cost (reads @ $0.10/MTok): $%.6f", cacheReadCost);
         LOG.debugf("Total Cost: $%.6f", totalCost);
         LOG.debug("====================");
     }

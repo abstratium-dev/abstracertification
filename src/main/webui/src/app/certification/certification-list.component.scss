@@ -29,6 +29,7 @@
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
   &:hover {
     border-color: var(--color-primary);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -40,11 +41,13 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  margin-bottom: 10px;
 }
 
 .certification-card.coming-soon {
   opacity: 0.85;
   border-style: dashed;
+  cursor: default;
   &:hover {
     transform: none;
     box-shadow: none;

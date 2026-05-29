@@ -5,7 +5,7 @@
   </div>
 
   <div class="certifications-grid" *ngIf="!loading() && !error() && certifications().length > 0">
-    <div *ngFor="let cert of certifications()" class="certification-card" [class.coming-soon]="cert.comingSoon" [class.in-progress]="!cert.comingSoon && hasStarted(cert.id)">
+    <div *ngFor="let cert of certifications()" class="certification-card" [class.coming-soon]="cert.comingSoon" [class.in-progress]="!cert.comingSoon && hasStarted(cert.id)" (click)="!cert.comingSoon && startCertification(cert.id)">
       <div class="certification-card-header">
         <span *ngIf="cert.comingSoon" class="coming-soon-badge">Coming Soon</span>
         <span *ngIf="!cert.comingSoon && hasStarted(cert.id)" class="in-progress-badge">In Progress</span>

@@ -4,6 +4,30 @@
         <span class="brand-name">ABSTRATIUM</span>
     </div>
 
+    <!-- Certification page controls - only shown on page routes -->
+    @if(isOnCertificationPage()) {
+    <div class="header-center">
+        <button class="btn-overview" (click)="navigateToOverview()">&#128196; Overview</button>
+        <div class="font-size-controls">
+            <button
+                class="font-size-btn"
+                [class.active]="fontSize === 'small'"
+                (click)="setFontSize('small')"
+                title="Small text">A</button>
+            <button
+                class="font-size-btn"
+                [class.active]="fontSize === 'medium'"
+                (click)="setFontSize('medium')"
+                title="Medium text">A</button>
+            <button
+                class="font-size-btn"
+                [class.active]="fontSize === 'large'"
+                (click)="setFontSize('large')"
+                title="Large text">A</button>
+        </div>
+    </div>
+    }
+
     <div class="header-right">
         <button 
             class="theme-toggle-btn" 

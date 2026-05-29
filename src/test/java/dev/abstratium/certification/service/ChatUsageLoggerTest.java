@@ -25,7 +25,9 @@ public class ChatUsageLoggerTest {
                 pageId, 
                 sessionId, 
                 50, // input tokens
-                30  // output tokens
+                30, // output tokens
+                100, // cache creation tokens
+                80   // cache read tokens
             );
         });
     }

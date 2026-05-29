@@ -24,11 +24,13 @@ export const routes: Routes = [
   },
   {
     path: 'certification/:certificationId',
-    loadComponent: () => import('./certification/certification-wizard.component').then(m => m.CertificationWizardComponent)
+    loadComponent: () => import('./certification/certification-wizard.component').then(m => m.CertificationWizardComponent),
+    data: { showCertificationControls: true }
   },
   {
     path: 'certification/:certificationId/page/:page',
-    loadComponent: () => import('./certification/certification-wizard.component').then(m => m.CertificationWizardComponent)
+    loadComponent: () => import('./certification/certification-wizard.component').then(m => m.CertificationWizardComponent),
+    data: { showCertificationControls: true }
   },
   {
     path: 'certification/:certificationId/overview',

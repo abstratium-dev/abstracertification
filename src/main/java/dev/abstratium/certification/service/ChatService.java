@@ -1,12 +1,10 @@
 package dev.abstratium.certification.service;
 
-import java.util.List;
-
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
-import dev.abstratium.certification.boundary.publik.ChatMessage;
 import dev.abstratium.certification.entity.CertificationStep;
+import dev.langchain4j.model.anthropic.AnthropicTokenUsage;
 import dev.langchain4j.service.TokenStream;
 import io.smallrye.mutiny.Multi;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -29,7 +27,7 @@ public class ChatService {
     @ConfigProperty(name = "provide.ai.help")
     boolean provideAiHelp;
 
-    public Multi<String> generateResponse(String userMessage, String certificationId, String pageId, List<ChatMessage> history, String sessionId) {
+    public Multi<String> generateResponse(String userMessage, String certificationId, String pageId, String sessionId) {
         // Check global AI property first
         if (!provideAiHelp) {
             return Multi.createFrom().emitter(e -> {
@@ -58,15 +56,12 @@ public class ChatService {
         
         LOG.infof("Starting chat response generation for certification: %s, session: %s", certificationId, sessionId);
         try {
-            // Get certification context
+            // Get certification context (placed in system message for prompt caching)
             String contextMessage = buildContextMessage(certificationId, pageId);
             
-            // Build the full prompt with context and constraints
-            String fullPrompt = buildFullPrompt(userMessage, contextMessage, history);
-
             // Generate streaming response using AI Service
             LOG.infof("Calling assistant.chat() for session: %s", sessionId);
-            TokenStream aiResponseStream = assistant.chat(fullPrompt);
+            TokenStream aiResponseStream = assistant.chat(sessionId, userMessage, contextMessage);
 
             // Create Multi<String> emitter for streaming tokens
             return Multi.createFrom().emitter(emitter -> {
@@ -106,13 +101,27 @@ public class ChatService {
                         
                         int inputTokens = response.metadata().tokenUsage().inputTokenCount();
                         int outputTokens = response.metadata().tokenUsage().outputTokenCount();
+                        int cacheCreationTokens = 0;
+                        int cacheReadTokens = 0;
+                        String tokenUsageClass = response.metadata().tokenUsage().getClass().getName();
+                        LOG.debugf("TokenUsage class: %s", tokenUsageClass);
+                        if (response.metadata().tokenUsage() instanceof AnthropicTokenUsage anthropicUsage) {
+                            cacheCreationTokens = anthropicUsage.cacheCreationInputTokens() != null ? anthropicUsage.cacheCreationInputTokens() : 0;
+                            cacheReadTokens = anthropicUsage.cacheReadInputTokens() != null ? anthropicUsage.cacheReadInputTokens() : 0;
+                            LOG.debugf("AnthropicTokenUsage raw values - cacheCreationInputTokens: %s, cacheReadInputTokens: %s",
+                                anthropicUsage.cacheCreationInputTokens(), anthropicUsage.cacheReadInputTokens());
+                        } else {
+                            LOG.debugf("TokenUsage is not AnthropicTokenUsage, cannot extract cache token counts");
+                        }
                         
                         usageLogger.logChatUsage(
                             certificationId, 
                             pageId, 
                             sessionId, 
                             inputTokens, 
-                            outputTokens
+                            outputTokens,
+                            cacheCreationTokens,
+                            cacheReadTokens
                         );
                     })
                     .onError(error -> {
@@ -132,45 +141,6 @@ public class ChatService {
         }
     }
 
-    private String formatHistory(List<ChatMessage> history) {
-        if (history == null || history.isEmpty()) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("# Chat History\n\n");
-        for (ChatMessage msg : history) {
-            String role = msg.getRole();
-            String content = msg.getContent();
-            
-            if ("user".equalsIgnoreCase(role)) {
-                sb.append("**User:** ").append(content).append("\n\n");
-            } else if ("assistant".equalsIgnoreCase(role)) {
-                sb.append("**Assistant:** ").append(content).append("\n\n");
-            } else {
-                sb.append("**").append(role.substring(0, 1).toUpperCase()).append(role.substring(1)).append(":** ").append(content).append("\n\n");
-            }
-        }
-        return sb.toString();
-    }
-
-    private String buildFullPrompt(String userMessage, String contextMessage, List<ChatMessage> history) {
-        StringBuilder prompt = new StringBuilder();
-
-        // Add current user message
-        prompt.append("# Current Question from Candidate that must be answered now:\n\n").append(userMessage).append("\n\n");
-
-        // Add context in markdown format
-        prompt.append("----\n\n").append(contextMessage).append("\n\n");
-
-        // Add chat history if available
-        if (history != null && !history.isEmpty()) {
-            prompt.append("----\n\n");
-            prompt.append(formatHistory(history));
-            prompt.append("\n\n");
-        }
-
-        return prompt.toString();
-    }
 
     private String buildContextMessage(String certificationId, String pageId) {
         try {
@@ -183,7 +153,7 @@ public class ChatService {
             StringBuilder context = new StringBuilder();
             
             // Certification header
-            context.append("# Certification Context").append(certification.getTitle()).append("\n\n");
+            context.append("# Certification Context: ").append(certification.getTitle()).append("\n\n");
             context.append("## ").append(certification.getTitle()).append("\n\n");
             context.append(certification.getDescription()).append("\n\n");
 
@@ -224,7 +194,7 @@ public class ChatService {
                     context.append("\n");
                 }
 
-                // Questions section (only show count, not actual questions)
+                // Questions section (show actual questions but not correct answers)
                 if (currentStep.getQuestions() != null && !currentStep.getQuestions().isEmpty()) {
                     int questionCount = currentStep.getQuestions().size();
                     context.append("#### Assessment Questions THAT YOU MUST NOT ANSWER\n\n");
@@ -233,12 +203,33 @@ public class ChatService {
                         context.append("s");
                     }
                     context.append("** that the candidate must answer themselves. You can provide hints and explanations but don't give direct answers.\n\n");
+
+                    int questionNum = 1;
+                    for (var question : currentStep.getQuestions()) {
+                        context.append("**Question ").append(questionNum).append(":** ").append(question.getText()).append("\n\n");
+
+                        if (question.getAnswerOptions() != null && !question.getAnswerOptions().isEmpty()) {
+                            context.append("Options:\n");
+                            char optionLetter = 'A';
+                            for (var option : question.getAnswerOptions()) {
+                                context.append("  ").append(optionLetter).append(") ").append(option.getText()).append("\n");
+                                optionLetter++;
+                            }
+                            context.append("\n");
+                        }
+                        questionNum++;
+                    }
                 }
             } else {
                 throw new RuntimeException("Page/Step not found");
             }
 
-            return context.toString();
+            String contextString = context.toString();
+            // Rough token estimate: ~4 chars per token for English text
+            int estimatedTokens = contextString.length() / 4;
+            LOG.debugf("Context message size: %d chars, ~%d estimated tokens (need 2048+ for Haiku caching)",
+                contextString.length(), estimatedTokens);
+            return contextString;
         } catch (Exception e) {
             return "# Error Loading Context\n\nAn error occurred while loading the certification context: " + e.getMessage();
         }

@@ -1,30 +1,8 @@
 <div class="wizard-container" *ngIf="definition">
   <!-- Header -->
-  <div class="wizard-header">
-    <h1>{{ definition.title }}</h1>
+  <div class="wizard-header" [class.font-small]="fontSize === 'small'" [class.font-large]="fontSize === 'large'">
+    <h1 class="certification-title">{{ definition.title }}</h1>
     <p class="description">{{ definition.description }}</p>
-
-    <!-- Header actions: Overview button and Font size controls -->
-    <div class="header-actions">
-      <button class="btn-secondary btn-overview" (click)="viewOverview.emit()">&#128196; Overview</button>
-      <div class="font-size-controls">
-        <button
-          class="font-size-btn"
-          [class.active]="fontSize === 'small'"
-          (click)="setFontSize('small')"
-          title="Small text">A</button>
-        <button
-          class="font-size-btn"
-          [class.active]="fontSize === 'medium'"
-          (click)="setFontSize('medium')"
-          title="Medium text">A</button>
-        <button
-          class="font-size-btn"
-          [class.active]="fontSize === 'large'"
-          (click)="setFontSize('large')"
-          title="Large text">A</button>
-      </div>
-    </div>
   </div>
 
   <!-- Progress bar -->

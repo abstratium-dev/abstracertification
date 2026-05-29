@@ -9,25 +9,15 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
-- reduce claude costs. it says:
+- advertise that it is AI based, if it is such.
 
-    You're not using prompt caching
-
-    Add a cache_control block to your requests to reuse expensive context. Most orgs see input costs drop 50–90%.
-
-    see   https://platform.claude.com/docs/en/build-with-claude/prompt-caching
-
-- show message that this is a test env and that no certs can actually be purchased
-
-- fix that refresh loses page history
+- add a classification field, and group by classification. IT, Business, etc.
 
 - integrate toggles - update abstracore to provide caching and interpretation. it should use the id token to build a map and that map can be used. it can add ip address to that too so that later it could base the decision on geolocation.
 
 - put Maxs feedback into certifications
 
 - improve test coverage
-
-- make fonts friendlier
 
 - simplify the overviews, they're too long
 
@@ -94,6 +84,14 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
   - certification on setting up and deploying abstrauth
   - setting up a secure samba server for file sharing
   - use abstravault or a kdg to secure the drive
+
+- TODO MAKE CHECK_ANSWER_DISTRIBUTION.PY AND CHECK_TERM_LENGTHS.PY GENERAL FOR ALL SCRIPTS!!
+- prompts for certification generation.
+  - check all of the answers. ensure that in only 25% of the cases, the correct answer is the longest (number of characters). in 50% of cases the correct answer should be longer than two other answers, etc. basically the length should be random and totally unrelated to the correctness. use the python program `scripts/check_answer_distribution.py` to measure distribution.
+  - ensure the length of the key concepts are ok for the database. see `scripts/check_term_lengths.py`
+  - write the certification so that a young person aged 18-25 will find it interesting and want to continue learning and working. Add anecdotes, stories and facts to support this style of learning.
+  - mermaid diagrams should be laid out vertially rather than horizontally.
+  - use mermaid diagrams where they support the text and make it easier to understand
 
 
 

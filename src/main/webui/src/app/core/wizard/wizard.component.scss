@@ -1,24 +1,16 @@
 .wizard-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
-.wizard-header { margin-bottom: 2rem; h1 { margin: 0 0 0.5rem 0; } position: relative; }
-.header-actions {
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.font-size-controls { display: flex; gap: 0.25rem; }
-.btn-overview { white-space: nowrap; }
-.font-size-btn {
-  width: 32px; height: 32px; border: 1px solid var(--color-border-primary); border-radius: 4px;
-  background: var(--color-bg-secondary); color: var(--color-text-secondary); cursor: pointer;
-  font-family: serif; font-weight: 600; padding: 0; transition: all 0.2s ease;
-  &:hover { border-color: var(--color-primary); background: var(--color-bg-hover); }
-  &.active { border-color: var(--color-primary); background: var(--color-primary); color: white; }
-  &:nth-child(1) { font-size: 0.75rem; }
-  &:nth-child(2) { font-size: 1rem; }
-  &:nth-child(3) { font-size: 1.25rem; }
+.wizard-header {
+  margin-bottom: 2rem;
+  .certification-title {
+    margin: 0 0 0.5rem 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.2;
+  }
+  .description { font-size: 1.35rem; }
+  &.font-small .description { font-size: 1.10rem; }
+  &.font-large .description { font-size: 1.60rem; }
 }
 .wizard-progress { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
 .progress-bar { flex: 1; height: 8px; background: var(--color-bg-secondary); border-radius: 4px; overflow: hidden; border: 1px solid var(--color-border-primary); }
@@ -105,7 +97,7 @@
 }
 .step-note {
   margin: 0.5rem 0 0 0;
-  font-size: 0.95rem;
+  font-size: 1.10rem;
   color: var(--color-text-secondary);
 
   p { margin: 0 0 0.5rem 0; &:last-child { margin-bottom: 0; } }
@@ -115,6 +107,8 @@
   li { margin-bottom: 0.2rem; }
   strong { font-style: normal; font-weight: 700; color: var(--color-text-primary); }
 }
+.wizard-page.font-small .step-note { font-size: 0.95rem; }
+.wizard-page.font-large .step-note { font-size: 1.30rem; }
 
 .questions-section {
   margin-bottom: 2rem; padding-top: 1.5rem; border-top: 2px solid var(--color-border-primary);
@@ -124,7 +118,9 @@
   background: var(--color-bg-primary); border: 1px solid var(--color-border-primary); border-radius: 8px;
   padding: 1.5rem; margin-bottom: 1.5rem; &:last-child { margin-bottom: 0; }
 }
-.question-text { margin: 0 0 1rem 0; font-weight: 600; font-size: 1.05rem; }
+.question-text { margin: 0 0 1rem 0; font-weight: 600; font-size: 1.20rem; }
+.wizard-page.font-small .question-text { font-size: 1.00rem; }
+.wizard-page.font-large .question-text { font-size: 1.40rem; }
 .options-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
 .option-label {
   display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;

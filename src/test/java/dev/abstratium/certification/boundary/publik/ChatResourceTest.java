@@ -4,8 +4,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -23,10 +21,6 @@ public class ChatResourceTest {
         validChatRequest.setCertificationId("test-certification");
         validChatRequest.setPageId("test-page");
         validChatRequest.setSessionId("test-session-123");
-        validChatRequest.setHistory(List.of(
-            new ChatMessage("user", "Previous question"),
-            new ChatMessage("assistant", "Previous answer")
-        ));
 
         // Setup invalid chat request (missing message)
         invalidChatRequest = new ChatRequest();
@@ -98,35 +92,16 @@ public class ChatResourceTest {
 
 
     @Test
-    void testChat_WithNullHistory_WorksCorrectly() {
-        ChatRequest requestWithNullHistory = new ChatRequest();
-        requestWithNullHistory.setMessage("Test message");
-        requestWithNullHistory.setCertificationId("test-certification");
-        requestWithNullHistory.setPageId("test-page");
-        requestWithNullHistory.setSessionId("test-session");
-        requestWithNullHistory.setHistory(null);
+    void testChat_ValidRequest_NonExistentCertification_ReturnsNotFound() {
+        ChatRequest request = new ChatRequest();
+        request.setMessage("Test message");
+        request.setCertificationId("test-certification");
+        request.setPageId("test-page");
+        request.setSessionId("test-session");
 
         given()
             .contentType("application/json")
-            .body(requestWithNullHistory)
-            .when()
-            .post("/public/certifications/test-certification/chat")
-            .then()
-            .statusCode(404); // Expected to return 404 since test certification doesn't exist
-    }
-
-    @Test
-    void testChat_WithEmptyHistory_WorksCorrectly() {
-        ChatRequest requestWithEmptyHistory = new ChatRequest();
-        requestWithEmptyHistory.setMessage("Test message");
-        requestWithEmptyHistory.setCertificationId("test-certification");
-        requestWithEmptyHistory.setPageId("test-page");
-        requestWithEmptyHistory.setSessionId("test-session");
-        requestWithEmptyHistory.setHistory(List.of());
-
-        given()
-            .contentType("application/json")
-            .body(requestWithEmptyHistory)
+            .body(request)
             .when()
             .post("/public/certifications/test-certification/chat")
             .then()
