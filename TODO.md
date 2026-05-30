@@ -57,6 +57,7 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 - gamify the whole thing
 - persistence for when answers are sent, IF the user is signed in
 - fix budgets in angular.json -> 5.5 mb is WAY to big
+- reduce mermaid bundle size — see `docs/ephemeral-and-volatile-and-temporary-but-interesting/MERMAID_LAZY_LOAD.md`
 - check we randomize the answers, not just the questions
 - make abstracertification check things that are available online or get the user to paste things that it can verify that the user has actually done the work
 - add links to other certifications on pages and at the end of a certification

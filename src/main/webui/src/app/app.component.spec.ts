@@ -17,8 +17,10 @@ describe('AppComponent', () => {
   let mockConfirmDialogService: Partial<ConfirmDialogService>;
 
   beforeEach(async () => {
-    mockAuthService = jasmine.createSpyObj('AuthService', ['signout'], {
-      token$: signal(ANONYMOUS)
+    mockAuthService = jasmine.createSpyObj('AuthService', ['signOut'], {
+      token$: signal(ANONYMOUS),
+      sessionFraction$: signal(0),
+      sessionMinutesRemaining$: signal(0)
     });
     mockThemeService = {
       theme$: signal('light'),

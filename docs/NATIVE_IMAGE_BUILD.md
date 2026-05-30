@@ -37,12 +37,13 @@ docker run -it --rm \
   -e SMTP_PASSWORD="${SMTP_PASSWORD}" \
   -e EMAIL_FROM="${EMAIL_FROM}" \
   -e ANTHROPIC_API_KEY="not-set" \
-  ghcr.io/abstratium-dev/abstracertification:latest
-  -e OAUTH_REDIRECT_URI="http://localhost:808x/oauth/callback" \
+  -e OAUTH_REDIRECT_URI="http://localhost:8085/oauth/callback" \
   -e QUARKUS_MANAGEMENT_HOST=0.0.0.0 \
   -e DEPLOYMENT_ENV="dev" \
+  -e ABSTRATIUM_TOGGLES_API_URL="${ABSTRATIUM_TOGGLES_API_URL}" \
+  -e ABSTRATIUM_TOGGLES_CONTEXT="${ABSTRATIUM_TOGGLES_CONTEXT}" \
   -e STAGE="dev" \
-  ghcr.io/abstratium-dev/TODO:latest
+  ghcr.io/abstratium-dev/abstracertification:latest
 ```
 
 e2e tests will work against this running image. see dev readme for tips on how to run them manually.

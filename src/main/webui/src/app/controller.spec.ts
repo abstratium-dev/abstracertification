@@ -31,7 +31,7 @@ describe('Controller', () => {
 
   describe('loadConfig', () => {
     it('should load config and update model service', async () => {
-      const mockConfig = { logLevel: 'INFO', provideAiHelp: false, warningMessage: '-' };
+      const mockConfig = { logLevel: 'INFO', provideAiHelp: false, warningMessage: '-', warningBgColor: '#fff3cd', brandLogoUrl: '', brandLogoAlt: '', brandName: '' };
 
       const configPromise = controller.loadConfig();
 

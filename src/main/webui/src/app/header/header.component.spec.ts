@@ -15,8 +15,10 @@ describe('HeaderComponent', () => {
   let mockThemeService: Partial<ThemeService>;
 
   beforeEach(async () => {
-    mockAuthService = jasmine.createSpyObj('AuthService', ['signout'], {
-      token$: signal(ANONYMOUS)
+    mockAuthService = jasmine.createSpyObj('AuthService', ['signOut'], {
+      token$: signal(ANONYMOUS),
+      sessionFraction$: signal(0),
+      sessionMinutesRemaining$: signal(0)
     });
     mockThemeService = {
       theme$: signal('light'),
@@ -46,8 +48,8 @@ describe('HeaderComponent', () => {
   });
 
   it('should call signout when signout button is clicked', () => {
-    component.signout();
-    expect(mockAuthService.signout).toHaveBeenCalled();
+    component.signOut();
+    expect(mockAuthService.signOut).toHaveBeenCalled();
   });
 
   it('should call toggleTheme when theme button is clicked', () => {
