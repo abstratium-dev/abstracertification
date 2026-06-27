@@ -9,15 +9,12 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 ## Today
 
-- after merging upstream
-  - is legal page still good?
-  - is header good?
+- remove "mba" from publicly used id of business fundamentals cert, using a NEW script.
+- add a disclaimer directly to that cert
 
 - advertise that it is AI based, if it is such.
 
 - add a classification field, and group by classification. IT, Business, etc.
-
-- integrate toggles - update abstracore to provide caching and interpretation. it should use the id token to build a map and that map can be used. it can add ip address to that too so that later it could base the decision on geolocation.
 
 - put Maxs feedback into certifications
 
@@ -33,9 +30,7 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 - allow signing up in prod, but requires default roles - is that something we already implemented?
 
-- abstrauth should do service token expiry, that is only half built
-
-- fix bug that refresh ruins the url that was in the browser and returns the user to the home page
+- abstrauth should do service token expiry, that is only half built -> in fact, totally redesign that, so its not client based but account based for service accounts
 
 - add other necessary microservices - see abstrerp
 
@@ -48,9 +43,8 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 - let users provide thumbs up for certification / show how many people have the certification
 
-- user needs to add the user to the right groups so that they can upload files to the server (var/www and etc/nginx)
 - track stats of how long a certification takes? that means updating cookie policy etc.
-- become gdpr compliant, we'll need to store user data first
+- become more gdpr compliant, we'll need to store user data first
 
 - make many answers longer so that the right one isn't always the longest one!
 - let signed in users add notes
@@ -79,10 +73,14 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 - further modules
   - raspberrypi as print server
+  - update cert on business fundamentals so that it doesn't suggest using other services, but suggests using abstratium services
+  - business server
+    - user needs to add the user to the right groups so that they can upload files to the server (var/www and etc/nginx)
   - remote desktop on linux
   - virtual box and run windsurf inside to avoid LLM breaking out
   - docker and installing some abstratium services to play around, including mysql, grafana, etc.
   - security and hardening with optional remote internet access to the server.
+  - hackable server for making an ethical hacking certification fun to do
   - wireguard vpn (peer to peer but as "client" and "server")
   - SSL with certbot from letsencrypt
     - including how to make it so that they are auto updated
@@ -92,11 +90,24 @@ These TODOs are to be resolved by the developer, NOT THE LLM.
 
 - TODO MAKE CHECK_ANSWER_DISTRIBUTION.PY AND CHECK_TERM_LENGTHS.PY GENERAL FOR ALL SCRIPTS!!
 - prompts for certification generation.
+
+  - read the following sql files which define a certification: @V01.021__insert_intro_security_testing_part1.sql@V01.022__insert_intro_security_testing_part2.sql@V01.023__insert_intro_security_testing_part3.sql@V01.024__insert_intro_security_testing_part4.sql 
+
+  see @DATABASE.md  which describes the data model.
+
+  now create a new markdown document, similar to @BUSINESS_FUNDAMENTALS_CERTIFICATION_OUTLINE.md , but focused solely on a new certification which covers a professional backup process that small businesses who use linux should implement.
+
+  it needs to also cover theory like 3-2-1 backup, as well as how a company can classify documents to decide on their backup strategy and retention periods.
+
   - check all of the answers. ensure that in only 25% of the cases, the correct answer is the longest (number of characters). in 50% of cases the correct answer should be longer than two other answers, etc. basically the length should be random and totally unrelated to the correctness. use the python program `scripts/check_answer_distribution.py` to measure distribution.
+
   - ensure the length of the key concepts are ok for the database. see `scripts/check_term_lengths.py`
+
   - write the certification so that a young person aged 18-25 will find it interesting and want to continue learning and working. Add anecdotes, stories and facts to support this style of learning.
-  - mermaid diagrams should be laid out vertially rather than horizontally.
-  - use mermaid diagrams where they support the text and make it easier to understand
+
+  - mermaid diagrams should be laid out vertically rather than horizontally.
+
+  - use mermaid diagrams where they support the text and make it easier to understand, and not just because you want to add a picture to each page.
 
 
 
